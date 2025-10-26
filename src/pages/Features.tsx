@@ -111,7 +111,7 @@ export default function Features() {
     
     const query = searchQuery.toLowerCase().trim()
     return featureItems.filter(feature => 
-      feature.title.toLowerCase().includes(query) ||
+      feature.path.toLowerCase().includes(query) ||
       feature.description.toLowerCase().includes(query)
     )
   }, [featureItems, searchQuery])
@@ -276,7 +276,7 @@ export default function Features() {
                 </p>
 
                 {/* Action Button */}
-                <Link to={`/features/${feature.title.toLowerCase().replace(/\s+/g, '-')}`}>
+                <Link to={`/features/${feature.path.toLowerCase().replace(/\s+/g, '-')}`}>
                   <Button 
                     variant="outline" 
                     className="bg-transparent border-gray-300 hover:border-gray-400 text-gray-700 hover:text-gray-900 w-full justify-between group/btn transition-colors"

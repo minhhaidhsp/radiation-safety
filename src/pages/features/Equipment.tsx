@@ -1,328 +1,292 @@
 /**
- * Trang Danh Mục Thiết Bị - Quản lý danh mục thiết bị và lịch sử mượn/trả
+ * Equipment feature page - Danh mục thiết bị
  */
-import { Link } from 'react-router-dom'
-import { 
-  Home,
-  ChevronRight,
-  ArrowLeft,
-  Plus,
-  Search,
-  Filter,
-  Download,
-  Eye,
-  Edit,
-  List,
-  Calendar,
-  User,
-  Package
-} from 'lucide-react'
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card'
 import { Button } from '../../components/ui/button'
+import { Badge } from '../../components/ui/badge'
+import { Input } from '../../components/ui/input'
+import { Search, Plus, Settings, Calendar, AlertTriangle, Home, ChevronRight, ArrowLeft } from 'lucide-react'
 import FeatureSidebar from '../../components/FeatureSidebar'
 
+interface Equipment {
+  id: number
+  name: string
+  model: string
+  serialNumber: string
+  department: string
+  lastMaintenance: string
+  nextMaintenance: string
+  status: 'operational' | 'maintenance' | 'out_of_service'
+}
+
 export default function Equipment() {
-  const [searchTerm, setSearchTerm] = useState('')
-  const [activeTab, setActiveTab] = useState('all')
-  
-  // Mock data cho thiết bị
-  const equipmentData = [
+  const [searchQuery, setSearchQuery] = useState('')
+  const [selectedStatus, setSelectedStatus] = useState('all')
+
+  const equipmentList: Equipment[] = [
     {
       id: 1,
-      name: 'Máy đo liều cá nhân TLD-100',
-      model: 'TLD-100',
-      serialNumber: 'SN-TLD-001',
-      department: 'Phòng X-quang',
-      status: 'available',
-      statusText: 'Có sẵn',
-      lastCalibration: '25/09/2025',
-      nextCalibration: '25/12/2025',
-      currentUser: 'Chưa có',
-      location: 'Kho thiết bị A'
+      name: 'Máy X-quang Digital',
+      model: 'DRX-5000',
+      serialNumber: 'XRG-2024-001',
+      department: 'X-quang',
+      lastMaintenance: '15/09/2025',
+      nextMaintenance: '15/12/2025',
+      status: 'operational'
     },
     {
       id: 2,
-      name: 'Máy đo liều OSL',
-      model: 'OSL-200',
-      serialNumber: 'SN-OSL-002',
-      department: 'Phòng CT Scanner',
-      status: 'borrowed',
-      statusText: 'Đang mượn',
-      lastCalibration: '24/09/2025',
-      nextCalibration: '24/12/2025',
-      currentUser: 'Nguyễn Văn A',
-      location: 'Phòng CT Scanner'
+      name: 'Máy CT Scan 64 lát',
+      model: 'CT-64S',
+      serialNumber: 'CTS-2024-002',
+      department: 'CT Scan',
+      lastMaintenance: '10/09/2025',
+      nextMaintenance: '10/10/2025',
+      status: 'maintenance'
     },
     {
       id: 3,
-      name: 'Máy đo liều phóng xạ',
-      model: 'RAD-300',
-      serialNumber: 'SN-RAD-003',
-      department: 'Phòng X-quang',
-      status: 'maintenance',
-      statusText: 'Bảo trì',
-      lastCalibration: '23/09/2025',
-      nextCalibration: '23/12/2025',
-      currentUser: 'Chưa có',
-      location: 'Phòng bảo trì'
+      name: 'Máy MRI 1.5T',
+      model: 'MRI-1500',
+      serialNumber: 'MRI-2024-003',
+      department: 'MRI',
+      lastMaintenance: '20/08/2025',
+      nextMaintenance: '20/11/2025',
+      status: 'operational'
+    },
+    {
+      id: 4,
+      name: 'Máy X-quang Mobile',
+      model: 'Mobile-XR',
+      serialNumber: 'MXR-2024-004',
+      department: 'Cấp cứu',
+      lastMaintenance: '05/07/2025',
+      nextMaintenance: '05/10/2025',
+      status: 'out_of_service'
     }
   ]
 
-  // Thống kê
-  const stats = [
-    { label: 'Tổng thiết bị', value: '45', change: '+8%' },
-    { label: 'Có sẵn', value: '32', change: '+5%' },
-    { label: 'Đang mượn', value: '10', change: '+2%' },
-    { label: 'Bảo trì', value: '3', change: '+1%' }
+  const statusColors = {
+    operational: 'bg-green-100 text-green-800',
+    maintenance: 'bg-yellow-100 text-yellow-800',
+    out_of_service: 'bg-red-100 text-red-800'
+  }
+
+  const statusLabels = {
+    operational: 'Đang hoạt động',
+    maintenance: 'Bảo trì',
+    out_of_service: 'Ngừng hoạt động'
+  }
+
+  const statusFilters = [
+    { id: 'all', name: 'Tất cả' },
+    { id: 'operational', name: 'Đang hoạt động' },
+    { id: 'maintenance', name: 'Bảo trì' },
+    { id: 'out_of_service', name: 'Ngừng hoạt động' }
   ]
 
-  const filteredData = equipmentData.filter(item =>
-    item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.department.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.model.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.serialNumber.toLowerCase().includes(searchTerm.toLowerCase())
-  ).filter(item => activeTab === 'all' || item.status === activeTab)
+  const filteredEquipment = equipmentList.filter(equipment => {
+    const matchesSearch = equipment.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         equipment.model.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         equipment.serialNumber.toLowerCase().includes(searchQuery.toLowerCase())
+    const matchesStatus = selectedStatus === 'all' || equipment.status === selectedStatus
+    return matchesSearch && matchesStatus
+  })
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-8 pt-28">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Breadcrumb và nút back */}
-        <div className="flex items-center justify-between mb-8">
-          <nav className="flex items-center space-x-2 text-sm text-gray-600">
-            <Link to="/" className="flex items-center hover:text-gray-900 transition-colors">
-              <Home className="w-4 h-4 mr-2" />
-              Trang chủ
-            </Link>
-            <ChevronRight className="w-4 h-4" />
-            <Link to="/features" className="hover:text-gray-900 transition-colors">
-              CÁC CHỨC NĂNG
-            </Link>
-            <ChevronRight className="w-4 h-4" />
-            <span className="text-gray-900 font-medium">Danh mục thiết bị</span>
-          </nav>
-
-          <Link
-            to="/features"
-            className="flex items-center px-4 py-2 bg-gradient-to-r from-blue-50 to-teal-50 text-[#004C99] hover:from-blue-100 hover:to-teal-100 transition-all duration-300 rounded-lg border border-blue-200 hover:border-blue-300"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Quay lại
-          </Link>
-        </div>
-
-        {/* Main Content với Sidebar */}
+      <div className="container mx-auto px-4">
         <div className="flex gap-8">
           {/* Sidebar */}
-          <FeatureSidebar />
+          <div className="hidden lg:block">
+            <FeatureSidebar />
+          </div>
 
-          {/* Content */}
+          {/* Main Content */}
           <div className="flex-1">
+            {/* Breadcrumb và nút Back */}
+            <div className="flex items-center justify-between mb-8">
+              <nav className="flex items-center space-x-2 text-sm text-gray-600">
+                <Link to="/" className="flex items-center hover:text-gray-900 transition-colors">
+                  <Home className="w-4 h-4 mr-2" />
+                  Trang chủ
+                </Link>
+                <ChevronRight className="w-4 h-4" />
+                <Link to="/features" className="hover:text-gray-900 transition-colors">
+                Các chức năng
+                </Link>
+                <ChevronRight className="w-4 h-4" />
+                <span className="text-gray-900 font-medium">Danh mục thiết bị</span>
+              </nav>
+
+              <Link
+                to="/features"
+                className="flex items-center px-4 py-2 bg-gradient-to-r from-blue-50 to-teal-50 text-[#004C99] hover:from-blue-100 hover:to-teal-100 transition-all duration-300 rounded-lg border border-blue-200 hover:border-blue-300"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Quay lại
+              </Link>
+            </div>
+
             {/* Header */}
-            <div className="text-center mb-12">
-              <div className="flex items-center justify-center mb-4">
-                <div className="p-4 rounded-2xl bg-gradient-to-br from-blue-50 to-teal-50 border border-blue-200">
-                  <List className="w-10 h-10 text-[#004C99]" />
-                </div>
-              </div>
-              <h1 className="text-4xl font-bold text-gray-900 mb-4">
+            <div className="text-center mb-8">
+              <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-[#004C99] to-[#00B8B0] bg-clip-text text-transparent">
                 DANH MỤC THIẾT BỊ
               </h1>
-              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                Quản lý danh mục thiết bị và theo dõi lịch sử mượn/trả thiết bị
+              <p className="text-lg text-gray-700 max-w-2xl mx-auto">
+                Quản lý và theo dõi thiết bị y tế sử dụng bức xạ
               </p>
             </div>
 
-            {/* Thống kê nhanh */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-              {stats.map((stat, index) => (
-                <div key={index} className="bg-white rounded-xl p-6 shadow-lg border border-gray-200">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <p className="text-sm text-gray-600 mb-1">{stat.label}</p>
-                      <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
-                    </div>
-                    <span className={`text-sm font-medium ${
-                      stat.change.startsWith('+') ? 'text-green-600' : 'text-red-600'
-                    }`}>
-                      {stat.change}
-                    </span>
+            {/* Stats Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+              <Card className="bg-white/80 backdrop-blur-sm border-blue-200">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Tổng thiết bị</CardTitle>
+                  <Settings className="h-4 w-4 text-blue-600" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-blue-600">42</div>
+                  <p className="text-xs text-gray-600">Đang quản lý</p>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-white/80 backdrop-blur-sm border-green-200">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Đang hoạt động</CardTitle>
+                  <Settings className="h-4 w-4 text-green-600" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-green-600">35</div>
+                  <p className="text-xs text-gray-600">Hoạt động tốt</p>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-white/80 backdrop-blur-sm border-yellow-200">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Đang bảo trì</CardTitle>
+                  <AlertTriangle className="h-4 w-4 text-yellow-600" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-yellow-600">4</div>
+                  <p className="text-xs text-gray-600">Cần theo dõi</p>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-white/80 backdrop-blur-sm border-red-200">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Ngừng hoạt động</CardTitle>
+                  <AlertTriangle className="h-4 w-4 text-red-600" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-red-600">3</div>
+                  <p className="text-xs text-gray-600">Cần sửa chữa</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Search and Filter */}
+            <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200 mb-8">
+              <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+                <div className="flex flex-col md:flex-row gap-4 flex-1">
+                  <div className="relative flex-1">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                    <Input
+                      type="text"
+                      placeholder="Tìm kiếm thiết bị..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="pl-10 pr-4 py-3 border-gray-300 rounded-xl"
+                    />
                   </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Search and Actions Bar */}
-            <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-8">
-              <div className="relative w-full sm:w-96">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <input
-                  type="text"
-                  placeholder="Tìm kiếm thiết bị, model, số serial..."
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004C99] focus:border-transparent"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
-              <div className="flex gap-3 w-full sm:w-auto">
-                <button className="flex items-center px-4 py-3 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-                  <Filter className="w-4 h-4 mr-2" />
-                  Lọc
-                </button>
-                <button className="flex items-center px-4 py-3 bg-gradient-to-r from-[#004C99] to-[#00B8B0] text-white rounded-lg hover:from-blue-700 hover:to-teal-600 transition-all duration-300 shadow-lg hover:shadow-xl">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Thêm thiết bị
-                </button>
-              </div>
-            </div>
-
-            {/* Tabs */}
-            <div className="flex space-x-1 mb-6 bg-white rounded-lg p-1 border border-gray-200 w-fit">
-              {['all', 'available', 'borrowed', 'maintenance'].map((tab) => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                    activeTab === tab
-                      ? 'bg-[#004C99] text-white shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  {tab === 'all' && 'Tất cả'}
-                  {tab === 'available' && 'Có sẵn'}
-                  {tab === 'borrowed' && 'Đang mượn'}
-                  {tab === 'maintenance' && 'Bảo trì'}
-                </button>
-              ))}
-            </div>
-
-            {/* Data Table */}
-            <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
-              <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-blue-50">
-                <div className="flex justify-between items-center">
-                  <div>
-                    <h2 className="text-xl font-semibold text-gray-900">
-                      Danh sách thiết bị ({filteredData.length})
-                    </h2>
-                    <p className="text-gray-600 text-sm mt-1">
-                      Quản lý tất cả thiết bị trong danh mục
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                        Thiết bị
-                      </th>
-                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                        Model & Số Serial
-                      </th>
-                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                        Phòng ban & Vị trí
-                      </th>
-                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                        Trạng thái & Người dùng
-                      </th>
-                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                        Hiệu chuẩn & Thao tác
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {filteredData.map((item) => (
-                      <tr key={item.id} className="hover:bg-blue-50 transition-colors duration-150">
-                        <td className="px-6 py-4">
-                          <div className="flex items-center">
-                            <div className="p-2 bg-blue-100 rounded-lg mr-3">
-                              <Package className="w-6 h-6 text-blue-600" />
-                            </div>
-                            <div>
-                              <div className="text-sm font-medium text-gray-900">
-                                {item.name}
-                              </div>
-                              <div className="text-sm text-gray-500">
-                                ID: TB{item.id.toString().padStart(3, '0')}
-                              </div>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="text-sm text-gray-900 font-medium mb-1">
-                            {item.model}
-                          </div>
-                          <div className="text-sm text-gray-500">
-                            {item.serialNumber}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="text-sm text-gray-900 font-medium">
-                            {item.department}
-                          </div>
-                          <div className="text-sm text-gray-500">
-                            {item.location}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="mb-2">
-                            <span className={`px-3 py-1 text-xs font-medium rounded-full ${
-                              item.status === 'available' 
-                                ? 'bg-green-100 text-green-800 border border-green-200' 
-                                : item.status === 'borrowed'
-                                ? 'bg-yellow-100 text-yellow-800 border border-yellow-200'
-                                : 'bg-red-100 text-red-800 border border-red-200'
-                            }`}>
-                              {item.statusText}
-                            </span>
-                          </div>
-                          <div className="text-sm text-gray-500 flex items-center">
-                            <User className="w-4 h-4 mr-1" />
-                            {item.currentUser}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="text-sm text-gray-900 mb-2">
-                            <Calendar className="w-4 h-4 inline mr-1" />
-                            Lần cuối: {item.lastCalibration}
-                          </div>
-                          <div className="text-sm text-gray-500 mb-3">
-                            Tiếp theo: {item.nextCalibration}
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <Button variant="outline" size="sm" className="bg-transparent p-2">
-                              <Eye className="w-4 h-4" />
-                            </Button>
-                            <Button variant="outline" size="sm" className="bg-transparent p-2">
-                              <Edit className="w-4 h-4" />
-                            </Button>
-                            <Button variant="outline" size="sm" className="bg-transparent p-2">
-                              <Download className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
+                  
+                  <div className="flex gap-2 flex-wrap">
+                    {statusFilters.map(filter => (
+                      <Button
+                        key={filter.id}
+                        variant={selectedStatus === filter.id ? "default" : "outline"}
+                        className="bg-transparent"
+                        onClick={() => setSelectedStatus(filter.id)}
+                      >
+                        {filter.name}
+                      </Button>
                     ))}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* Table Footer */}
-              <div className="px-6 py-4 bg-gradient-to-r from-gray-50 to-blue-50 border-t border-gray-200">
-                <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-                  <p className="text-sm text-gray-600">
-                    Hiển thị {filteredData.length} trong tổng số {equipmentData.length} thiết bị
-                  </p>
-                  <div className="flex items-center space-x-3">
-                    <Button variant="outline" className="bg-transparent">
-                      <Download className="w-4 h-4 mr-2" />
-                      Xuất danh sách
-                    </Button>
                   </div>
                 </div>
+                
+                <Button className="bg-gradient-to-r from-[#004C99] to-[#00B8B0] text-white">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Thêm thiết bị mới
+                </Button>
               </div>
             </div>
+
+            {/* Equipment Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {filteredEquipment.map(equipment => (
+                <Card key={equipment.id} className="bg-white/80 backdrop-blur-sm border-gray-200 hover:shadow-xl transition-all duration-300">
+                  <CardHeader>
+                    <div className="flex justify-between items-start mb-2">
+                      <CardTitle className="text-xl text-gray-800">{equipment.name}</CardTitle>
+                      <Badge className={statusColors[equipment.status]}>
+                        {statusLabels[equipment.status]}
+                      </Badge>
+                    </div>
+                    <CardDescription className="text-gray-700">
+                      {equipment.model} - {equipment.serialNumber}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      <div className="flex justify-between text-sm text-gray-600">
+                        <span>Phòng ban:</span>
+                        <strong>{equipment.department}</strong>
+                      </div>
+                      
+                      <div className="flex justify-between text-sm text-gray-600">
+                        <span>Bảo trì lần cuối:</span>
+                        <strong>{equipment.lastMaintenance}</strong>
+                      </div>
+
+                      <div className="flex justify-between text-sm text-gray-600">
+                        <span>Bảo trì tiếp theo:</span>
+                        <strong className={
+                          equipment.status === 'maintenance' ? 'text-yellow-600' :
+                          equipment.status === 'out_of_service' ? 'text-red-600' : 'text-gray-900'
+                        }>
+                          {equipment.nextMaintenance}
+                        </strong>
+                      </div>
+
+                      <div className="flex gap-2 pt-2">
+                        <Button variant="outline" size="sm" className="bg-transparent flex-1">
+                          <Settings className="w-4 h-4 mr-2" />
+                          Chi tiết
+                        </Button>
+                        <Button variant="outline" size="sm" className="bg-transparent">
+                          <Calendar className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            {/* Empty State */}
+            {filteredEquipment.length === 0 && (
+              <div className="text-center py-12">
+                <Settings className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-gray-600 mb-2">
+                  Không tìm thấy thiết bị phù hợp
+                </h3>
+                <p className="text-gray-500">
+                  Thử thay đổi từ khóa tìm kiếm hoặc bộ lọc
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>

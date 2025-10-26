@@ -80,7 +80,7 @@ export default function App() {
               } 
             />
             <Route 
-              path="/features/thu-vien-tai-lieu" 
+              path="/features/library" 
               element={
                 <ProtectedRoute>
                   <Library />
@@ -96,7 +96,7 @@ export default function App() {
               } 
             />
             <Route 
-              path="/features/do-lieu-nhan-su" 
+              path="/features/dosimetry" 
               element={
                 <ProtectedRoute>
                   <Dosimetry />
@@ -104,7 +104,7 @@ export default function App() {
               } 
             />
             <Route 
-              path="/features/giay-phep" 
+              path="/features/permits" 
               element={
                 <ProtectedRoute>
                   <Permits />
@@ -112,7 +112,7 @@ export default function App() {
               } 
             />
             <Route 
-              path="/features/theo-doi-ton-kho" 
+              path="/features/inventory" 
               element={
                 <ProtectedRoute>
                   <Inventory />
@@ -120,7 +120,7 @@ export default function App() {
               } 
             />
             <Route 
-              path="/features/quan-ly-may-moc" 
+              path="/features/machines" 
               element={
                 <ProtectedRoute>
                   <Machines />
@@ -128,7 +128,7 @@ export default function App() {
               } 
             />
             <Route 
-              path="/features/danh-muc-thiet-bi" 
+              path="/features/equipment" 
               element={
                 <ProtectedRoute>
                   <Equipment />
@@ -136,7 +136,7 @@ export default function App() {
               } 
             />
             <Route 
-              path="/features/bao-cao" 
+              path="/features/reporting" 
               element={
                 <ProtectedRoute>
                   <Reporting />
@@ -144,7 +144,7 @@ export default function App() {
               } 
             />
             <Route 
-              path="/features/quan-ly-su-co" 
+              path="/features/incidents" 
               element={
                 <ProtectedRoute>
                   <Incidents />
@@ -152,7 +152,7 @@ export default function App() {
               } 
             />
             <Route 
-              path="/features/quan-ly-chat-thai" 
+              path="/features/waste" 
               element={
                 <ProtectedRoute>
                   <Waste />
@@ -160,7 +160,7 @@ export default function App() {
               } 
             />
             <Route 
-              path="/features/dao-tao" 
+              path="/features/training" 
               element={
                 <ProtectedRoute>
                   <Training />

@@ -79,52 +79,55 @@ export default function Incidents() {
     { label: 'Khẩn cấp', value: '1', change: '0%' }
   ]
 
+  const filteredIncidents = incidentsData.filter(incident =>
+    incident.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    incident.reportedBy.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    incident.department.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    incident.description.toLowerCase().includes(searchTerm.toLowerCase())
+  ).filter(incident => activeTab === 'all' || incident.status === activeTab)
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-8 pt-28">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Breadcrumb và nút back */}
-        <div className="flex items-center justify-between mb-8">
-          <nav className="flex items-center space-x-2 text-sm text-gray-600">
-            <Link to="/" className="flex items-center hover:text-gray-900 transition-colors">
-              <Home className="w-4 h-4 mr-2" />
-              Trang chủ
-            </Link>
-            <ChevronRight className="w-4 h-4" />
-            <Link to="/features" className="hover:text-gray-900 transition-colors">
-              CÁC CHỨC NĂNG
-            </Link>
-            <ChevronRight className="w-4 h-4" />
-            <span className="text-gray-900 font-medium">Quản lý sự cố</span>
-          </nav>
-
-          <Link
-            to="/features"
-            className="flex items-center px-4 py-2 bg-gradient-to-r from-blue-50 to-teal-50 text-[#004C99] hover:from-blue-100 hover:to-teal-100 transition-all duration-300 rounded-lg border border-blue-200 hover:border-blue-300"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Quay lại
-          </Link>
-        </div>
-
-        {/* Main Content với Sidebar */}
+      <div className="container mx-auto px-4">
         <div className="flex gap-8">
           {/* Sidebar */}
-          <FeatureSidebar />
+          <div className="hidden lg:block">
+            <FeatureSidebar />
+          </div>
 
-          {/* Content */}
+          {/* Main Content */}
           <div className="flex-1">
+            {/* Breadcrumb và nút back */}
+            <div className="flex items-center justify-between mb-8">
+              <nav className="flex items-center space-x-2 text-sm text-gray-600">
+                <Link to="/" className="flex items-center hover:text-gray-900 transition-colors">
+                  <Home className="w-4 h-4 mr-2" />
+                  Trang chủ
+                </Link>
+                <ChevronRight className="w-4 h-4" />
+                <Link to="/features" className="hover:text-gray-900 transition-colors">
+                Các chức năng
+                </Link>
+                <ChevronRight className="w-4 h-4" />
+                <span className="text-gray-900 font-medium">Quản lý sự cố</span>
+              </nav>
+
+              <Link
+                to="/features"
+                className="flex items-center px-4 py-2 bg-gradient-to-r from-blue-50 to-teal-50 text-[#004C99] hover:from-blue-100 hover:to-teal-100 transition-all duration-300 rounded-lg border border-blue-200 hover:border-blue-300"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Quay lại
+              </Link>
+            </div>
+
             {/* Header */}
-            <div className="text-center mb-12">
-              <div className="flex items-center justify-center mb-4">
-                <div className="p-4 rounded-2xl bg-gradient-to-br from-blue-50 to-teal-50 border border-blue-200">
-                  <AlertTriangle className="w-10 h-10 text-[#004C99]" />
-                </div>
-              </div>
-              <h1 className="text-4xl font-bold text-gray-900 mb-4">
-                QUẢN LÝ SỰ CỐ
+            <div className="text-center mb-8">
+              <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-[#004C99] to-[#00B8B0] bg-clip-text text-transparent">
+              QUẢN LÝ SỰ CỐ
               </h1>
-              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                Ghi nhận và theo dõi các sự cố, cảnh báo an toàn bức xạ
+              <p className="text-lg text-gray-700 max-w-2xl mx-auto">
+              Ghi nhận và theo dõi các sự cố, cảnh báo an toàn bức xạ
               </p>
             </div>
 
@@ -177,7 +180,7 @@ export default function Incidents() {
                 <div className="flex justify-between items-center">
                   <div>
                     <h2 className="text-xl font-semibold text-gray-900">
-                      Danh sách sự cố ({incidentsData.length})
+                      Danh sách sự cố ({filteredIncidents.length})
                     </h2>
                     <p className="text-gray-600 text-sm mt-1">
                       Quản lý tất cả sự cố và cảnh báo an toàn
@@ -208,7 +211,7 @@ export default function Incidents() {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {incidentsData.map((incident) => (
+                    {filteredIncidents.map((incident) => (
                       <tr key={incident.id} className="hover:bg-blue-50 transition-colors duration-150">
                         <td className="px-6 py-4">
                           <div className="flex items-center">
@@ -294,7 +297,7 @@ export default function Incidents() {
               <div className="px-6 py-4 bg-gradient-to-r from-gray-50 to-blue-50 border-t border-gray-200">
                 <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
                   <p className="text-sm text-gray-600">
-                    Hiển thị {incidentsData.length} trong tổng số {incidentsData.length} sự cố
+                    Hiển thị {filteredIncidents.length} trong tổng số {incidentsData.length} sự cố
                   </p>
                   <div className="flex items-center space-x-3">
                     <Button variant="outline" className="bg-transparent">

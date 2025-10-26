@@ -5,10 +5,16 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { Menu, X, ChevronDown, User, LogOut } from 'lucide-react'
 
+interface UserData {
+  username: string
+  displayName: string
+}
+
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [userData, setUserData] = useState<UserData | null>(null)
   const location = useLocation()
   const navigate = useNavigate()
 
@@ -18,16 +24,50 @@ export default function Navbar() {
     }
     window.addEventListener('scroll', handleScroll)
     
-    // Kiểm tra trạng thái đăng nhập
-    const loggedIn = localStorage.getItem('isLoggedIn') === 'true'
-    setIsLoggedIn(loggedIn)
+    // Kiểm tra trạng thái đăng nhập và thông tin người dùng
+    const checkAuth = () => {
+      const loggedIn = localStorage.getItem('isLoggedIn') === 'true'
+      setIsLoggedIn(loggedIn)
+      
+      if (loggedIn) {
+        const userStr = localStorage.getItem('user')
+        if (userStr) {
+          try {
+            setUserData(JSON.parse(userStr))
+          } catch {
+            setUserData({ username: 'admin', displayName: 'Quản trị viên' })
+          }
+        }
+      } else {
+        setUserData(null)
+      }
+    }
     
-    return () => window.removeEventListener('scroll', handleScroll)
+    checkAuth()
+    
+    // Lắng nghe sự kiện storage để cập nhật khi đăng nhập/đăng xuất
+    window.addEventListener('storage', checkAuth)
+    
+    // Lắng nghe sự kiện tùy chỉnh để cập nhật trạng thái
+    const handleAuthChange = () => {
+      checkAuth()
+    }
+    window.addEventListener('authChange', handleAuthChange)
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+      window.removeEventListener('storage', checkAuth)
+      window.removeEventListener('authChange', handleAuthChange)
+    }
   }, [])
 
   const handleLogout = () => {
     localStorage.setItem('isLoggedIn', 'false')
+    localStorage.removeItem('user')
     setIsLoggedIn(false)
+    setUserData(null)
+    // Kích hoạt sự kiện để các component khác biết
+    window.dispatchEvent(new Event('authChange'))
     navigate('/')
     setIsMenuOpen(false)
   }
@@ -92,10 +132,10 @@ export default function Navbar() {
                 </Link>
               )
             ))}
-            {isLoggedIn && (
-              <div className="flex items-center space-x-2 text-sm text-gray-700">
+            {isLoggedIn && userData && (
+              <div className="flex items-center space-x-2 text-sm text-gray-700 bg-gradient-to-r from-blue-50 to-teal-50 px-4 py-2 rounded-lg border border-blue-200">
                 <User className="w-4 h-4" />
-                <span>Admin User</span>
+                <span>{userData.displayName}</span>
               </div>
             )}
           </div>
@@ -140,10 +180,10 @@ export default function Navbar() {
                   </Link>
                 )
               ))}
-              {isLoggedIn && (
-                <div className="px-4 py-3 flex items-center text-gray-700">
+              {isLoggedIn && userData && (
+                <div className="px-4 py-3 flex items-center text-gray-700 bg-gradient-to-r from-blue-50 to-teal-50 rounded-lg border border-blue-200">
                   <User className="w-4 h-4 mr-2" />
-                  <span>Admin User</span>
+                  <span>{userData.displayName}</span>
                 </div>
               )}
             </div>

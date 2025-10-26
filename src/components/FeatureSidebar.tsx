@@ -12,7 +12,7 @@ export default function FeatureSidebar() {
     <div className="w-80 bg-white rounded-2xl shadow-lg border border-gray-200 h-fit sticky top-32">
       {/* Header */}
       <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-blue-50 rounded-t-2xl">
-        <h2 className="text-lg font-semibold text-gray-900">Các Tính Năng</h2>
+        <h2 className="text-lg font-semibold text-gray-900">Chức Năng</h2>
         <p className="text-sm text-gray-600 mt-1">Chuyển đổi nhanh giữa các tính năng</p>
       </div>
 
@@ -20,12 +20,12 @@ export default function FeatureSidebar() {
       <div className="p-4 space-y-2">
         {features.map((feature) => {
           const IconComponent = feature.icon
-          const isActive = location.pathname.includes(feature.title.toLowerCase().replace(/\s+/g, '-'))
+          const isActive = location.pathname.includes(feature.path.toLowerCase().replace(/\s+/g, '-'))
           
           return (
             <Link
               key={feature.id}
-              to={`/features/${feature.title.toLowerCase().replace(/\s+/g, '-')}`}
+              to={`/features/${feature.path.toLowerCase().replace(/\s+/g, '-')}`}
               className={`flex items-center p-3 rounded-xl transition-all duration-200 group ${
                 isActive
                   ? 'bg-gradient-to-r from-blue-50 to-teal-50 border border-blue-200 shadow-sm'

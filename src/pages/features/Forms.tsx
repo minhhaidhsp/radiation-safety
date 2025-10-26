@@ -1,328 +1,275 @@
 /**
- * Trang Quản lý Biểu mẫu - Tạo và quản lý biểu mẫu điện tử
+ * Forms feature page - Quản lý biểu mẫu
  */
-import { Link } from 'react-router-dom'
-import { 
-  Home,
-  ChevronRight,
-  ArrowLeft,
-  Plus,
-  Search,
-  Filter,
-  Download,
-  Eye,
-  Edit,
-  FileText,
-  MoreVertical
-} from 'lucide-react'
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card'
 import { Button } from '../../components/ui/button'
+import { Badge } from '../../components/ui/badge'
+import { Input } from '../../components/ui/input'
+import { Search, Plus, FileText, Download, Edit, Users, Calendar, Home, ChevronRight, ArrowLeft } from 'lucide-react'
 import FeatureSidebar from '../../components/FeatureSidebar'
 
+interface FormTemplate {
+  id: number
+  title: string
+  description: string
+  category: string
+  submissions: number
+  lastUpdated: string
+  status: 'active' | 'draft' | 'archived'
+}
+
 export default function Forms() {
-  const [searchTerm, setSearchTerm] = useState('')
-  const [activeTab, setActiveTab] = useState('all')
-  
-  // Mock data cho biểu mẫu
-  const formsData = [
+  const [searchQuery, setSearchQuery] = useState('')
+  const [selectedCategory, setSelectedCategory] = useState('all')
+
+  const formTemplates: FormTemplate[] = [
     {
       id: 1,
-      name: 'Biểu mẫu đăng ký sử dụng thiết bị',
-      description: 'Đăng ký sử dụng thiết bị X-quang cho nhân viên',
-      createdBy: 'Nguyễn Văn A',
-      status: 'approved',
-      statusText: 'Đã duyệt',
-      createdDate: '25/09/2025',
-      lastModified: '2 giờ trước',
-      department: 'Phòng Kỹ thuật',
-      type: 'Đăng ký',
-      fileSize: '1.2 MB',
-      attachments: 3,
-      dueDate: '30/09/2025'
+      title: 'Biểu mẫu kiểm tra an toàn',
+      description: 'Đánh giá định kỳ các tiêu chuẩn an toàn bức xạ',
+      category: 'safety',
+      submissions: 45,
+      lastUpdated: '25/09/2025',
+      status: 'active'
     },
     {
       id: 2,
-      name: 'Biểu mẫu báo cáo sự cố',
-      description: 'Báo cáo sự cố an toàn bức xạ',
-      createdBy: 'Trần Thị B',
-      status: 'pending',
-      statusText: 'Chờ duyệt',
-      createdDate: '24/09/2025',
-      lastModified: '5 giờ trước',
-      department: 'Phòng An toàn',
-      type: 'Báo cáo',
-      fileSize: '0.8 MB',
-      attachments: 2,
-      dueDate: '28/09/2025'
+      title: 'Báo cáo sự cố',
+      description: 'Ghi nhận và báo cáo các sự cố liên quan đến bức xạ',
+      category: 'incident',
+      submissions: 12,
+      lastUpdated: '24/09/2025',
+      status: 'active'
     },
     {
       id: 3,
-      name: 'Biểu mẫu kiểm kê thiết bị',
-      description: 'Kiểm kê thiết bị phóng xạ định kỳ',
-      createdBy: 'Lê Văn C',
-      status: 'approved',
-      statusText: 'Đã duyệt',
-      createdDate: '23/09/2025',
-      lastModified: '1 ngày trước',
-      department: 'Phòng Vận hành',
-      type: 'Kiểm kê',
-      fileSize: '2.1 MB',
-      attachments: 5,
-      dueDate: '25/09/2025'
+      title: 'Đăng ký sử dụng thiết bị',
+      description: 'Đăng ký và theo dõi sử dụng thiết bị bức xạ',
+      category: 'equipment',
+      submissions: 89,
+      lastUpdated: '22/09/2025',
+      status: 'active'
+    },
+    {
+      id: 4,
+      title: 'Biểu mẫu đào tạo',
+      description: 'Đánh giá và theo dõi đào tạo an toàn bức xạ',
+      category: 'training',
+      submissions: 67,
+      lastUpdated: '20/09/2025',
+      status: 'draft'
     }
   ]
 
-  // Thống kê
-  const stats = [
-    { label: 'Tổng biểu mẫu', value: '156', change: '+12%' },
-    { label: 'Chờ duyệt', value: '23', change: '+5%' },
-    { label: 'Đã duyệt', value: '128', change: '+8%' },
-    { label: 'Quá hạn', value: '5', change: '-2%' }
+  const categories = [
+    { id: 'all', name: 'Tất cả' },
+    { id: 'safety', name: 'An toàn' },
+    { id: 'incident', name: 'Sự cố' },
+    { id: 'equipment', name: 'Thiết bị' },
+    { id: 'training', name: 'Đào tạo' }
   ]
 
-  const filteredForms = formsData.filter(form =>
-    form.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    form.createdBy.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    form.department.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    form.description.toLowerCase().includes(searchTerm.toLowerCase())
-  ).filter(form => activeTab === 'all' || form.status === activeTab)
+  const statusColors = {
+    active: 'bg-green-100 text-green-800',
+    draft: 'bg-yellow-100 text-yellow-800',
+    archived: 'bg-gray-100 text-gray-800'
+  }
+
+  const filteredForms = formTemplates.filter(form => {
+    const matchesSearch = form.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         form.description.toLowerCase().includes(searchQuery.toLowerCase())
+    const matchesCategory = selectedCategory === 'all' || form.category === selectedCategory
+    return matchesSearch && matchesCategory
+  })
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-8 pt-28">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Breadcrumb và nút back */}
-        <div className="flex items-center justify-between mb-8">
-          <nav className="flex items-center space-x-2 text-sm text-gray-600">
-            <Link to="/" className="flex items-center hover:text-gray-900 transition-colors">
-              <Home className="w-4 h-4 mr-2" />
-              Trang chủ
-            </Link>
-            <ChevronRight className="w-4 h-4" />
-            <Link to="/features" className="hover:text-gray-900 transition-colors">
-              CÁC CHỨC NĂNG
-            </Link>
-            <ChevronRight className="w-4 h-4" />
-            <span className="text-gray-900 font-medium">Biểu mẫu</span>
-          </nav>
-
-          <Link
-            to="/features"
-            className="flex items-center px-4 py-2 bg-gradient-to-r from-blue-50 to-teal-50 text-[#004C99] hover:from-blue-100 hover:to-teal-100 transition-all duration-300 rounded-lg border border-blue-200 hover:border-blue-300"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Quay lại
-          </Link>
-        </div>
-
-        {/* Main Content với Sidebar */}
+      <div className="container mx-auto px-4">
         <div className="flex gap-8">
           {/* Sidebar */}
-          <FeatureSidebar />
+          <div className="hidden lg:block">
+            <FeatureSidebar />
+          </div>
 
-          {/* Content */}
+          {/* Main Content */}
           <div className="flex-1">
+            {/* Breadcrumb và nút Back */}
+            <div className="flex items-center justify-between mb-8">
+              <nav className="flex items-center space-x-2 text-sm text-gray-600">
+                <Link to="/" className="flex items-center hover:text-gray-900 transition-colors">
+                  <Home className="w-4 h-4 mr-2" />
+                  Trang chủ
+                </Link>
+                <ChevronRight className="w-4 h-4" />
+                <Link to="/features" className="hover:text-gray-900 transition-colors">
+                Các chức năng
+                </Link>
+                <ChevronRight className="w-4 h-4" />
+                <span className="text-gray-900 font-medium">Quản lý biểu mẫu</span>
+              </nav>
+
+              <Link
+                to="/features"
+                className="flex items-center px-4 py-2 bg-gradient-to-r from-blue-50 to-teal-50 text-[#004C99] hover:from-blue-100 hover:to-teal-100 transition-all duration-300 rounded-lg border border-blue-200 hover:border-blue-300"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Quay lại
+              </Link>
+            </div>
+
             {/* Header */}
-            <div className="text-center mb-12">
-              <div className="flex items-center justify-center mb-4">
-                <div className="p-4 rounded-2xl bg-gradient-to-br from-blue-50 to-teal-50 border border-blue-200">
-                  <FileText className="w-10 h-10 text-[#004C99]" />
-                </div>
-              </div>
-              <h1 className="text-4xl font-bold text-gray-900 mb-4">
+            <div className="text-center mb-8">
+              <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-[#004C99] to-[#00B8B0] bg-clip-text text-transparent">
                 QUẢN LÝ BIỂU MẪU
               </h1>
-              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                Tạo và quản lý biểu mẫu điện tử với quy trình phê duyệt tự động
+              <p className="text-lg text-gray-700 max-w-2xl mx-auto">
+                Tạo và quản lý các biểu mẫu, báo cáo an toàn bức xạ
               </p>
             </div>
 
-            {/* Thống kê nhanh */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-              {stats.map((stat, index) => (
-                <div key={index} className="bg-white rounded-xl p-6 shadow-lg border border-gray-200">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <p className="text-sm text-gray-600 mb-1">{stat.label}</p>
-                      <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
-                    </div>
-                    <span className={`text-sm font-medium ${
-                      stat.change.startsWith('+') ? 'text-green-600' : 'text-red-600'
-                    }`}>
-                      {stat.change}
-                    </span>
-                  </div>
-                </div>
-              ))}
+            {/* Stats Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+              <Card className="bg-white/80 backdrop-blur-sm border-blue-200">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Tổng biểu mẫu</CardTitle>
+                  <FileText className="h-4 w-4 text-blue-600" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-blue-600">24</div>
+                  <p className="text-xs text-gray-600">+2 tháng này</p>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-white/80 backdrop-blur-sm border-green-200">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Đang hoạt động</CardTitle>
+                  <Users className="h-4 w-4 text-green-600" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-green-600">18</div>
+                  <p className="text-xs text-gray-600">Đang sử dụng</p>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-white/80 backdrop-blur-sm border-orange-200">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Lượt gửi</CardTitle>
+                  <Download className="h-4 w-4 text-orange-600" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-orange-600">213</div>
+                  <p className="text-xs text-gray-600">Tháng này</p>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-white/80 backdrop-blur-sm border-purple-200">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Cập nhật gần nhất</CardTitle>
+                  <Calendar className="h-4 w-4 text-purple-600" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-purple-600">Hôm nay</div>
+                  <p className="text-xs text-gray-600">25/09/2025</p>
+                </CardContent>
+              </Card>
             </div>
 
-            {/* Search and Actions Bar */}
-            <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-8">
-              <div className="relative w-full sm:w-96">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <input
-                  type="text"
-                  placeholder="Tìm kiếm biểu mẫu, người tạo, phòng ban..."
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004C99] focus:border-transparent"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
-              <div className="flex gap-3 w-full sm:w-auto">
-                <button className="flex items-center px-4 py-3 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-                  <Filter className="w-4 h-4 mr-2" />
-                  Lọc
-                </button>
-                <button className="flex items-center px-4 py-3 bg-gradient-to-r from-[#004C99] to-[#00B8B0] text-white rounded-lg hover:from-blue-700 hover:to-teal-600 transition-all duration-300 shadow-lg hover:shadow-xl">
+            {/* Search and Filter */}
+            <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200 mb-8">
+              <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+                <div className="flex flex-col md:flex-row gap-4 flex-1">
+                  <div className="relative flex-1">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                    <Input
+                      type="text"
+                      placeholder="Tìm kiếm biểu mẫu..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="pl-10 pr-4 py-3 border-gray-300 rounded-xl"
+                    />
+                  </div>
+                  
+                  <div className="flex gap-2 flex-wrap">
+                    {categories.map(category => (
+                      <Button
+                        key={category.id}
+                        variant={selectedCategory === category.id ? "default" : "outline"}
+                        className="bg-transparent"
+                        onClick={() => setSelectedCategory(category.id)}
+                      >
+                        {category.name}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+                
+                <Button className="bg-gradient-to-r from-[#004C99] to-[#00B8B0] text-white">
                   <Plus className="w-4 h-4 mr-2" />
                   Tạo biểu mẫu mới
-                </button>
+                </Button>
               </div>
             </div>
 
-            {/* Tabs */}
-            <div className="flex space-x-1 mb-6 bg-white rounded-lg p-1 border border-gray-200 w-fit">
-              {['all', 'approved', 'pending'].map((tab) => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                    activeTab === tab
-                      ? 'bg-[#004C99] text-white shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  {tab === 'all' && 'Tất cả'}
-                  {tab === 'approved' && 'Đã duyệt'}
-                  {tab === 'pending' && 'Chờ duyệt'}
-                </button>
+            {/* Forms Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {filteredForms.map(form => (
+                <Card key={form.id} className="bg-white/80 backdrop-blur-sm border-gray-200 hover:shadow-xl transition-all duration-300">
+                  <CardHeader>
+                    <div className="flex justify-between items-start mb-2">
+                      <CardTitle className="text-xl text-gray-800">{form.title}</CardTitle>
+                      <Badge className={statusColors[form.status]}>
+                        {form.status === 'active' && 'Đang hoạt động'}
+                        {form.status === 'draft' && 'Bản nháp'}
+                        {form.status === 'archived' && 'Đã lưu trữ'}
+                      </Badge>
+                    </div>
+                    <CardDescription className="text-gray-700">
+                      {form.description}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      <div className="flex justify-between text-sm text-gray-600">
+                        <span>Danh mục: <strong>{categories.find(c => c.id === form.category)?.name}</strong></span>
+                        <span>Lượt gửi: <strong>{form.submissions}</strong></span>
+                      </div>
+                      
+                      <div className="flex justify-between text-sm text-gray-600">
+                        <span>Cập nhật: <strong>{form.lastUpdated}</strong></span>
+                      </div>
+
+                      <div className="flex gap-2 pt-2">
+                        <Button variant="outline" size="sm" className="bg-transparent flex-1">
+                          <Edit className="w-4 h-4 mr-2" />
+                          Chỉnh sửa
+                        </Button>
+                        <Button variant="outline" size="sm" className="bg-transparent">
+                          <Download className="w-4 h-4" />
+                        </Button>
+                        <Button variant="outline" size="sm" className="bg-transparent">
+                          <Users className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
               ))}
             </div>
 
-            {/* Data Table */}
-            <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
-              <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-blue-50">
-                <div className="flex justify-between items-center">
-                  <div>
-                    <h2 className="text-xl font-semibold text-gray-900">
-                      Danh sách biểu mẫu ({filteredForms.length})
-                    </h2>
-                    <p className="text-gray-600 text-sm mt-1">
-                      Quản lý tất cả biểu mẫu điện tử trong hệ thống
-                    </p>
-                  </div>
-                </div>
+            {/* Empty State */}
+            {filteredForms.length === 0 && (
+              <div className="text-center py-12">
+                <FileText className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-gray-600 mb-2">
+                  Không tìm thấy biểu mẫu phù hợp
+                </h3>
+                <p className="text-gray-500">
+                  Thử thay đổi từ khóa tìm kiếm hoặc bộ lọc
+                </p>
               </div>
-
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                        Tên biểu mẫu
-                      </th>
-                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                        Người tạo & Phòng ban
-                      </th>
-                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                        Loại & Kích thước
-                      </th>
-                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                        Trạng thái & Hạn hoàn thành
-                      </th>
-                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                        Thao tác
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {filteredForms.map((form) => (
-                      <tr key={form.id} className="hover:bg-blue-50 transition-colors duration-150">
-                        <td className="px-6 py-4">
-                          <div>
-                            <div className="text-sm font-medium text-gray-900 mb-1">
-                              {form.name}
-                            </div>
-                            <div className="text-sm text-gray-500">
-                              {form.description}
-                            </div>
-                            <div className="flex items-center mt-1">
-                              <FileText className="w-4 h-4 text-gray-400 mr-1" />
-                              <span className="text-xs text-gray-500">
-                                {form.attachments} tệp đính kèm
-                              </span>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="text-sm text-gray-900 font-medium">
-                            {form.createdBy}
-                          </div>
-                          <div className="text-sm text-gray-500">
-                            {form.department}
-                          </div>
-                          <div className="text-xs text-gray-400 mt-1">
-                            Tạo: {form.createdDate}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="text-sm text-gray-900 mb-1">
-                            {form.type}
-                          </div>
-                          <div className="text-sm text-gray-500">
-                            {form.fileSize}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="mb-2">
-                            <span className={`px-3 py-1 text-xs font-medium rounded-full ${
-                              form.status === 'approved' 
-                                ? 'bg-green-100 text-green-800 border border-green-200' 
-                                : 'bg-yellow-100 text-yellow-800 border border-yellow-200'
-                            }`}>
-                              {form.statusText}
-                            </span>
-                          </div>
-                          <div className="text-sm text-gray-500">
-                            Hạn: {form.dueDate}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center space-x-2">
-                            <Button variant="outline" size="sm" className="bg-transparent p-2">
-                              <Eye className="w-4 h-4" />
-                            </Button>
-                            <Button variant="outline" size="sm" className="bg-transparent p-2">
-                              <Edit className="w-4 h-4" />
-                            </Button>
-                            <Button variant="outline" size="sm" className="bg-transparent p-2">
-                              <Download className="w-4 h-4" />
-                            </Button>
-                            <Button variant="outline" size="sm" className="bg-transparent p-2">
-                              <MoreVertical className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* Table Footer */}
-              <div className="px-6 py-4 bg-gradient-to-r from-gray-50 to-blue-50 border-t border-gray-200">
-                <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-                  <p className="text-sm text-gray-600">
-                    Hiển thị {filteredForms.length} trong tổng số {formsData.length} biểu mẫu
-                  </p>
-                  <div className="flex items-center space-x-3">
-                    <Button variant="outline" className="bg-transparent">
-                      <Download className="w-4 h-4 mr-2" />
-                      Xuất danh sách
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </div>
+            )}
           </div>
         </div>
       </div>

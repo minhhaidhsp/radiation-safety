@@ -81,7 +81,7 @@ export default function Home() {
               </span>
             </motion.h1>
             
-            <motion.div
+            {/* <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
@@ -90,7 +90,7 @@ export default function Home() {
               <span className="text-2xl md:text-3xl font-semibold text-[#00B8B0] bg-gradient-to-r from-[#00B8B0] to-[#004C99] bg-clip-text text-transparent">
                 ACEView AI
               </span>
-            </motion.div>
+            </motion.div> */}
             
             <motion.p
               initial={{ opacity: 0, y: 20 }}
