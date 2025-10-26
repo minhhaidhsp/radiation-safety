@@ -1,0 +1,86 @@
+🚀 Hướng dẫn Triển khai Trang web
+===========================
+
+📋 Chuẩn bị:
+Đảm bảo bạn đã có thư mục dist/ — đây là bản dựng cuối cùng của trang web của bạn
+
+💡 Triển khai lên Nền tảng Đám mây (Khuyến nghị):
+
+🌟 Vercel (vercel.com) – Dễ nhất
+1. Truy cập vercel.com và đăng ký
+2. Nhấp vào "New Project"
+3. Chọn "Browse All Templates" → "Static"
+4. Kéo và thả thư mục dist/ vào khu vực tải lên
+5. Nhập tên dự án, nhấp "Deploy"
+6. Nhận URL HTTPS miễn phí trong vài phút!
+
+☁️ Cloudflare Pages (pages.cloudflare.com) – Nhanh nhất
+1. Truy cập pages.cloudflare.com và đăng nhập
+2. Nhấp vào "Create a project" → "Upload assets"
+3. Nén thư mục dist/
+4. Tải lên tệp zip
+5. Đặt tên dự án, nhấp "Deploy site"
+6. Tận hưởng tăng tốc CDN toàn cầu!
+
+🔥 Netlify (netlify.com) – Thân thiện với Người dùng
+1. Truy cập netlify.com và đăng ký
+2. Kéo và thả thư mục dist/ vào khu vực tải lên trang chủ
+3. Chờ tải lên hoàn tất
+4. Bạn sẽ nhận được một tên miền ngẫu nhiên (có thể tùy chỉnh trong cài đặt)
+
+📘 GitHub Pages (pages.github.com) – Miễn phí & Đáng tin cậy
+1. Tạo một kho lưu trữ mới trên GitHub
+2. Tải lên nội dung của thư mục dist/ vào repo
+3. Truy cập Cài đặt kho lưu trữ → Pages
+4. Chọn "Deploy from a branch" → nhánh chính
+5. Truy cập trang web của bạn tại username.github.io/tên-kho-lưu-trữ
+
+---
+
+🔧 Triển khai Nâng cao (Dành cho Nhà phát triển):
+
+Triển khai Tự động Dựa trên Git
+1. Đẩy toàn bộ dự án (bao gồm mã nguồn) lên GitHub/GitLab
+2. Kết nối repo của bạn với Vercel/Netlify
+3. Cấu hình cài đặt xây dựng:
+   - Lệnh xây dựng: npm run build
+   - Thư mục xuất bản: dist
+   - Phiên bản Node.js: 16.x hoặc cao hơn
+4. Mỗi lần đẩy sẽ tự động kích hoạt xây dựng & triển khai
+
+Triển khai Máy chủ Truyền thống
+Nếu bạn có máy chủ riêng:
+1. Tải lên tất cả các tệp bên trong thư mục dist/ vào thư mục gốc web của máy chủ
+2. Đảm bảo máy chủ hỗ trợ lưu trữ tệp tĩnh
+3. Truy cập trang web của bạn qua tên miền của bạn
+
+---
+
+💰 Thông tin Giá cả:
+- Vercel: Gói miễn phí đủ cho sử dụng cá nhân
+- Cloudflare Pages: Hoàn toàn miễn phí, không giới hạn
+- Netlify: Gói miễn phí bao gồm 100GB băng thông/tháng
+- GitHub Pages: Hoàn toàn miễn phí, 100GB băng thông/tháng
+
+---
+
+🎯 Khuyến nghị:
+- Người mới bắt đầu: Vercel hoặc Netlify (tải lên kéo-thả)
+- Tập trung vào tốc độ: Cloudflare Pages
+- Dự án dài hạn: GitHub Pages
+- Nhà phát triển: Triển khai Tự động Dựa trên Git
+
+---
+
+⚡ Mẹo:
+- Tất cả các nền tảng đều cung cấp chứng chỉ HTTPS miễn phí
+- Bạn có thể gắn tên miền tùy chỉnh (một số yêu cầu gói trả phí)
+- Sau khi triển khai, kiểm tra trang web của bạn trên các thiết bị khác nhau
+
+---
+
+🆘 Khắc phục sự cố:
+1. Đảm bảo bạn tải lên nội dung của dist/, không phải toàn bộ dự án
+2. Kiểm tra rằng index.html nằm trong thư mục gốc
+3. Xem lại nhật ký lỗi trên nền tảng lưu trữ
+4. Đảm bảo tất cả các tệp đã được tải lên đúng cách

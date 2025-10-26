@@ -1,0 +1,32 @@
+📂 Cấu trúc Thư mục:
+├── dist/            ⭐ Đây là bản dựng sản xuất (khuyến nghị sử dụng trực tiếp)
+│   ├── index.html   → Mở tệp này trong trình duyệt để xem trước trang web
+│   ├── assets/      → Các tệp CSS, JS và tài nguyên khác đã được gói gọn
+│   └── ...
+├── src/             📝 Thư mục mã nguồn (dành cho phát triển và chỉnh sửa)
+│   ├── components/  → Các thành phần React
+│   ├── App.jsx      → Thành phần ứng dụng chính
+│   ├── index.js     → Tệp đầu vào
+│   └── ...
+├── package.json     📦 Cấu hình phụ thuộc dự án
+├── README.md        📖 Tài liệu dự án
+└── ...
+
+🚀 Khởi động Nhanh (Hai Lựa chọn):
+Lựa chọn 1: Sử dụng Trực tiếp (Khuyến nghị cho Người mới bắt đầu)
+1. Điều hướng đến thư mục dist/
+2. Nhấp đúp vào tệp index.html
+3. Trang web sẽ mở trong trình duyệt của bạn!
+
+Lựa chọn 2: Chế độ Phát triển (Dành cho Người có Kinh nghiệm Lập trình)
+1. Đảm bảo đã cài đặt Node.js (phiên bản khuyến nghị: 16+)
+2. Mở terminal/dòng lệnh trong thư mục gốc của dự án
+3. Chạy: npm install
+4. Chạy: npm start
+5. Máy chủ phát triển sẽ tự động mở trong trình duyệt của bạn
+
+💡 Mẹo:
+- Thư mục dist/ chứa bản dựng tối ưu và có thể triển khai trực tiếp lên máy chủ
+- Tệp index.html ở cấp gốc không phải là phiên bản cuối cùng — luôn sử dụng tệp bên trong dist/
+- Để chỉnh sửa mã, chỉnh sửa các tệp bên trong src/ và xây dựng lại dự án
+- Dự án sử dụng ngăn xếp công nghệ TypeScript và Tailwind CSS
