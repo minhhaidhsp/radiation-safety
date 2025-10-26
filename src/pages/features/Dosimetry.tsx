@@ -1,7 +1,7 @@
 /**
  * Trang Đo Liều Nhân Sự - Quản lý và theo dõi liều bức xạ nhân sự
  */
-import { Link } from 'react-router'
+import { Link } from 'react-router-dom'
 import { 
   Home,
   ChevronRight,

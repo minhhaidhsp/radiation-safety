@@ -1,7 +1,7 @@
 /**
  * Component sidebar hiển thị danh sách các tính năng để điều hướng
  */
-import { Link, useLocation } from 'react-router'
+import { Link, useLocation } from 'react-router-dom'
 import { features } from '../data/features'
 import { ChevronRight } from 'lucide-react'
 

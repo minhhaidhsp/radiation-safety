@@ -3,7 +3,7 @@
  * Hiển thị danh sách vật tư, thiết bị và theo dõi số lượng tồn kho
  */
 import { useState } from 'react'
-import { Link, useLocation } from 'react-router'
+import { Link, useLocation } from 'react-router-dom'
 import { Search, Plus, Package, TrendingUp, AlertTriangle } from 'lucide-react'
 import { Button } from '../../components/ui/button'
 import { Input } from '../../components/ui/input'

@@ -1,7 +1,7 @@
 /**
  * Component thanh điều hướng chính với hiệu ứng cải tiến và xử lý trạng thái đăng nhập
  */
-import { Link, useLocation, useNavigate } from 'react-router'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { Menu, X, ChevronDown, User, LogOut } from 'lucide-react'
 

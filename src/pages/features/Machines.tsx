@@ -3,7 +3,7 @@
  * Theo dõi và quản lý các thiết bị máy móc trong hệ thống
  */
 import { useState } from 'react'
-import { Link, useLocation } from 'react-router'
+import { Link, useLocation } from 'react-router-dom'
 import { Search, Plus, Cpu, Clock, CheckCircle, XCircle } from 'lucide-react'
 import { Button } from '../../components/ui/button'
 import { Input } from '../../components/ui/input'

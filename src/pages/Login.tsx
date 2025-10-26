@@ -4,7 +4,7 @@
  */
 import { motion } from 'framer-motion'
 import { useState } from 'react'
-import { useNavigate } from 'react-router'
+import { useNavigate } from 'react-router-dom'
 import { Eye, EyeOff, LogIn } from 'lucide-react'
 
 export default function Login() {

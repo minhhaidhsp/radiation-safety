@@ -3,7 +3,7 @@
  * Defines all routes and protected route logic
  */
 import { useState, useEffect } from 'react'
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import Home from './pages/Home'

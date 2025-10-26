@@ -2,7 +2,7 @@
  * Trang hiển thị các chức năng hệ thống với tính năng tìm kiếm và kéo thả
  */
 import { useState, useEffect, useMemo } from 'react'
-import { Link } from 'react-router'
+import { Link } from 'react-router-dom'
 import { features } from '../data/features'
 import { GripVertical, ArrowRight, Search, Filter } from 'lucide-react'
 import { Button } from '../components/ui/button'
