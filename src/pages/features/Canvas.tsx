@@ -1,7 +1,7 @@
 /**
  * Trang Canvas - Công cụ vẽ và chỉnh sửa
  */
-import { Link } from 'react-router'
+import { Link } from 'react-router-dom'
 import { 
   Home,
   ChevronRight,

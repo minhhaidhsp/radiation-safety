@@ -2,7 +2,7 @@
  * Trang chủ Landing Page với tiêu đề được cải thiện và hiệu ứng màu sắc
  */
 import { motion } from 'framer-motion'
-import { Link } from 'react-router'
+import { Link } from 'react-router-dom'
 import { ArrowRight, CheckCircle, FileText, Clock, Shield, Workflow, Zap } from 'lucide-react'
 
 export default function Home() {

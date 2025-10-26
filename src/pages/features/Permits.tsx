@@ -1,7 +1,7 @@
 /**
  * Trang Giấy Phép - Quản lý giấy phép an toàn bức xạ
  */
-import { Link } from 'react-router'
+import { Link } from 'react-router-dom'
 import { 
   Home,
   ChevronRight,

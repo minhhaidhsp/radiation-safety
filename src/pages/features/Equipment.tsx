@@ -1,7 +1,7 @@
 /**
  * Trang Danh Mục Thiết Bị - Quản lý danh mục thiết bị và lịch sử mượn/trả
  */
-import { Link } from 'react-router'
+import { Link } from 'react-router-dom'
 import { 
   Home,
   ChevronRight,

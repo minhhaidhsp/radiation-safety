@@ -1,7 +1,7 @@
 /**
  * Trang Thư viện tài liệu - Lưu trữ và chia sẻ tài liệu an toàn
  */
-import { Link } from 'react-router'
+import { Link } from 'react-router-dom'
 import { 
   Home,
   ChevronRight,

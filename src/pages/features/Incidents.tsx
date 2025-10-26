@@ -1,7 +1,7 @@
 /**
  * Trang Quản Lý Sự Cố - Ghi nhận và theo dõi các sự cố, cảnh báo
  */
-import { Link } from 'react-router'
+import { Link } from 'react-router-dom'
 import { 
   Home,
   ChevronRight,

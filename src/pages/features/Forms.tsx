@@ -1,7 +1,7 @@
 /**
  * Trang Quản lý Biểu mẫu - Tạo và quản lý biểu mẫu điện tử
  */
-import { Link } from 'react-router'
+import { Link } from 'react-router-dom'
 import { 
   Home,
   ChevronRight,
