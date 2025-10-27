@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../..
 import { Button } from '../../components/ui/button'
 import { Badge } from '../../components/ui/badge'
 import { Input } from '../../components/ui/input'
-import { Search, Plus, Settings, Calendar, AlertTriangle, Home, ChevronRight, ArrowLeft } from 'lucide-react'
+import { Search, Plus, Settings, Calendar, AlertTriangle, Home, ChevronRight, ArrowLeft, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react'
 import FeatureSidebar from '../../components/FeatureSidebar'
 
 interface Equipment {
@@ -24,6 +24,8 @@ interface Equipment {
 export default function Equipment() {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedStatus, setSelectedStatus] = useState('all')
+  const [sortBy, setSortBy] = useState<'name' | 'model' | 'serialNumber' | 'department' | 'lastMaintenance' | 'nextMaintenance' | 'status'>('name')
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc')
 
   const equipmentList: Equipment[] = [
     {
@@ -94,6 +96,50 @@ export default function Equipment() {
     const matchesStatus = selectedStatus === 'all' || equipment.status === selectedStatus
     return matchesSearch && matchesStatus
   })
+
+  const parseDate = (d: string) => {
+    const [day, month, year] = d.split('/').map(Number)
+    return new Date(year, (month || 1) - 1, day || 1).getTime()
+  }
+
+  const statusOrder: Record<Equipment['status'], number> = {
+    operational: 1,
+    maintenance: 2,
+    out_of_service: 3
+  }
+
+  const sortedEquipment = [...filteredEquipment].sort((a, b) => {
+    let cmp = 0
+    switch (sortBy) {
+      case 'name':
+        cmp = a.name.localeCompare(b.name)
+        break
+      case 'model':
+        cmp = a.model.localeCompare(b.model)
+        break
+      case 'serialNumber':
+        cmp = a.serialNumber.localeCompare(b.serialNumber)
+        break
+      case 'department':
+        cmp = a.department.localeCompare(b.department)
+        break
+      case 'lastMaintenance':
+        cmp = parseDate(a.lastMaintenance) - parseDate(b.lastMaintenance)
+        break
+      case 'nextMaintenance':
+        cmp = parseDate(a.nextMaintenance) - parseDate(b.nextMaintenance)
+        break
+      case 'status':
+        cmp = statusOrder[a.status] - statusOrder[b.status]
+        break
+    }
+    return sortDir === 'asc' ? cmp : -cmp
+  })
+
+  const handleSort = (field: typeof sortBy) => {
+    if (sortBy === field) setSortDir(sortDir === 'asc' ? 'desc' : 'asc')
+    else { setSortBy(field); setSortDir('asc') }
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-8 pt-28">
@@ -223,8 +269,90 @@ export default function Equipment() {
               </div>
             </div>
 
+            {/* Equipment Table */}
+            <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden mb-8">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
+                        <button className="inline-flex items-center gap-1" onClick={() => handleSort('name')}>
+                          Thiết bị
+                          {sortBy !== 'name' ? <ArrowUpDown className="w-4 h-4 text-gray-400" /> : (sortDir === 'asc' ? <ArrowUp className="w-4 h-4 text-gray-600" /> : <ArrowDown className="w-4 h-4 text-gray-600" />)}
+                        </button>
+                      </th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
+                        <button className="inline-flex items-center gap-1" onClick={() => handleSort('model')}>
+                          Model
+                          {sortBy !== 'model' ? <ArrowUpDown className="w-4 h-4 text-gray-400" /> : (sortDir === 'asc' ? <ArrowUp className="w-4 h-4 text-gray-600" /> : <ArrowDown className="w-4 h-4 text-gray-600" />)}
+                        </button>
+                      </th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
+                        <button className="inline-flex items-center gap-1" onClick={() => handleSort('serialNumber')}>
+                          Serial
+                          {sortBy !== 'serialNumber' ? <ArrowUpDown className="w-4 h-4 text-gray-400" /> : (sortDir === 'asc' ? <ArrowUp className="w-4 h-4 text-gray-600" /> : <ArrowDown className="w-4 h-4 text-gray-600" />)}
+                        </button>
+                      </th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
+                        <button className="inline-flex items-center gap-1" onClick={() => handleSort('department')}>
+                          Phòng ban
+                          {sortBy !== 'department' ? <ArrowUpDown className="w-4 h-4 text-gray-400" /> : (sortDir === 'asc' ? <ArrowUp className="w-4 h-4 text-gray-600" /> : <ArrowDown className="w-4 h-4 text-gray-600" />)}
+                        </button>
+                      </th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
+                        <button className="inline-flex items-center gap-1" onClick={() => handleSort('lastMaintenance')}>
+                          Bảo trì gần nhất
+                          {sortBy !== 'lastMaintenance' ? <ArrowUpDown className="w-4 h-4 text-gray-400" /> : (sortDir === 'asc' ? <ArrowUp className="w-4 h-4 text-gray-600" /> : <ArrowDown className="w-4 h-4 text-gray-600" />)}
+                        </button>
+                      </th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
+                        <button className="inline-flex items-center gap-1" onClick={() => handleSort('nextMaintenance')}>
+                          Kế tiếp
+                          {sortBy !== 'nextMaintenance' ? <ArrowUpDown className="w-4 h-4 text-gray-400" /> : (sortDir === 'asc' ? <ArrowUp className="w-4 h-4 text-gray-600" /> : <ArrowDown className="w-4 h-4 text-gray-600" />)}
+                        </button>
+                      </th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
+                        <button className="inline-flex items-center gap-1" onClick={() => handleSort('status')}>
+                          Trạng thái
+                          {sortBy !== 'status' ? <ArrowUpDown className="w-4 h-4 text-gray-400" /> : (sortDir === 'asc' ? <ArrowUp className="w-4 h-4 text-gray-600" /> : <ArrowDown className="w-4 h-4 text-gray-600" />)}
+                        </button>
+                      </th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Hành động</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {sortedEquipment.map(equipment => (
+                      <tr key={equipment.id} className="hover:bg-gray-50 transition-colors">
+                        <td className="px-6 py-4">
+                          <div className="text-sm font-semibold text-gray-900">{equipment.name}</div>
+                        </td>
+                        <td className="px-6 py-4"><div className="text-sm text-gray-700">{equipment.model}</div></td>
+                        <td className="px-6 py-4"><div className="text-sm text-gray-700">{equipment.serialNumber}</div></td>
+                        <td className="px-6 py-4"><div className="text-sm text-gray-700">{equipment.department}</div></td>
+                        <td className="px-6 py-4"><div className="text-sm text-gray-700">{equipment.lastMaintenance}</div></td>
+                        <td className="px-6 py-4"><div className="text-sm text-gray-700">{equipment.nextMaintenance}</div></td>
+                        <td className="px-6 py-4">
+                          <Badge className={statusColors[equipment.status]}>{statusLabels[equipment.status]}</Badge>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex gap-2">
+                            <Button variant="outline" size="sm" className="bg-transparent">
+                              <Settings className="w-4 h-4" />
+                            </Button>
+                            <Button variant="outline" size="sm" className="bg-transparent">
+                              <Calendar className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
             {/* Equipment Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="hidden grid grid-cols-1 lg:grid-cols-2 gap-6">
               {filteredEquipment.map(equipment => (
                 <Card key={equipment.id} className="bg-white/80 backdrop-blur-sm border-gray-200 hover:shadow-xl transition-all duration-300">
                   <CardHeader>

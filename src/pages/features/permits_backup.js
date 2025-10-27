@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../..
 import { Button } from '../../components/ui/button'
 import { Badge } from '../../components/ui/badge'
 import { Input } from '../../components/ui/input'
-import { Search, Plus, FileText, Calendar, AlertTriangle, Home, ChevronRight, ArrowLeft, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react'
+import { Search, Plus, FileText, Calendar, AlertTriangle, Home, ChevronRight, ArrowLeft } from 'lucide-react'
 import FeatureSidebar from '../../components/FeatureSidebar'
 
 interface Permit {
@@ -23,8 +23,6 @@ interface Permit {
 export default function Permits() {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedStatus, setSelectedStatus] = useState('all')
-  const [sortBy, setSortBy] = useState<'permitNumber' | 'type' | 'holder' | 'issueDate' | 'expiryDate' | 'status'>('permitNumber')
-  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc')
 
   const permits: Permit[] = [
     {
@@ -94,52 +92,6 @@ export default function Permits() {
     const matchesStatus = selectedStatus === 'all' || permit.status === selectedStatus
     return matchesSearch && matchesStatus
   })
-
-  const parseDate = (d: string) => {
-    const [day, month, year] = d.split('/').map(Number)
-    return new Date(year, (month || 1) - 1, day || 1).getTime()
-  }
-
-  const statusOrder: Record<Permit['status'], number> = {
-    active: 1,
-    expiring: 2,
-    renewal: 3,
-    expired: 4
-  }
-
-  const sortedPermits = [...filteredPermits].sort((a, b) => {
-    let cmp = 0
-    switch (sortBy) {
-      case 'permitNumber':
-        cmp = a.permitNumber.localeCompare(b.permitNumber)
-        break
-      case 'type':
-        cmp = a.type.localeCompare(b.type)
-        break
-      case 'holder':
-        cmp = a.holder.localeCompare(b.holder)
-        break
-      case 'issueDate':
-        cmp = parseDate(a.issueDate) - parseDate(b.issueDate)
-        break
-      case 'expiryDate':
-        cmp = parseDate(a.expiryDate) - parseDate(b.expiryDate)
-        break
-      case 'status':
-        cmp = statusOrder[a.status] - statusOrder[b.status]
-        break
-    }
-    return sortDir === 'asc' ? cmp : -cmp
-  })
-
-  const handleSort = (field: typeof sortBy) => {
-    if (sortBy === field) {
-      setSortDir(sortDir === 'asc' ? 'desc' : 'asc')
-    } else {
-      setSortBy(field)
-      setSortDir('asc')
-    }
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-8 pt-28">
@@ -269,115 +221,8 @@ export default function Permits() {
               </div>
             </div>
 
-            {/* Permits Table */}
-            <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden mb-8">
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
-                        <button className="inline-flex items-center gap-1" onClick={() => handleSort('permitNumber')}>
-                          Số giấy phép
-                          {sortBy !== 'permitNumber' ? <ArrowUpDown className="w-4 h-4 text-gray-400" /> : (sortDir === 'asc' ? <ArrowUp className="w-4 h-4 text-gray-600" /> : <ArrowDown className="w-4 h-4 text-gray-600" />)}
-                        </button>
-                      </th>
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
-                        <button className="inline-flex items-center gap-1" onClick={() => handleSort('type')}>
-                          Loại
-                          {sortBy !== 'type' ? <ArrowUpDown className="w-4 h-4 text-gray-400" /> : (sortDir === 'asc' ? <ArrowUp className="w-4 h-4 text-gray-600" /> : <ArrowDown className="w-4 h-4 text-gray-600" />)}
-                        </button>
-                      </th>
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
-                        <button className="inline-flex items-center gap-1" onClick={() => handleSort('holder')}>
-                          Chủ sở hữu
-                          {sortBy !== 'holder' ? <ArrowUpDown className="w-4 h-4 text-gray-400" /> : (sortDir === 'asc' ? <ArrowUp className="w-4 h-4 text-gray-600" /> : <ArrowDown className="w-4 h-4 text-gray-600" />)}
-                        </button>
-                      </th>
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
-                        <button className="inline-flex items-center gap-1" onClick={() => handleSort('issueDate')}>
-                          Ngày cấp
-                          {sortBy !== 'issueDate' ? <ArrowUpDown className="w-4 h-4 text-gray-400" /> : (sortDir === 'asc' ? <ArrowUp className="w-4 h-4 text-gray-600" /> : <ArrowDown className="w-4 h-4 text-gray-600" />)}
-                        </button>
-                      </th>
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
-                        <button className="inline-flex items-center gap-1" onClick={() => handleSort('expiryDate')}>
-                          Ngày hết hạn
-                          {sortBy !== 'expiryDate' ? <ArrowUpDown className="w-4 h-4 text-gray-400" /> : (sortDir === 'asc' ? <ArrowUp className="w-4 h-4 text-gray-600" /> : <ArrowDown className="w-4 h-4 text-gray-600" />)}
-                        </button>
-                      </th>
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
-                        <button className="inline-flex items-center gap-1" onClick={() => handleSort('status')}>
-                          Trạng thái
-                          {sortBy !== 'status' ? <ArrowUpDown className="w-4 h-4 text-gray-400" /> : (sortDir === 'asc' ? <ArrowUp className="w-4 h-4 text-gray-600" /> : <ArrowDown className="w-4 h-4 text-gray-600" />)}
-                        </button>
-                      </th>
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Hành động</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200">
-                    {sortedPermits.map(permit => (
-                      <tr key={permit.id} className="hover:bg-gray-50 transition-colors">
-                        <td className="px-6 py-4">
-                          <div className="text-sm font-semibold text-gray-900">{permit.permitNumber}</div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="text-sm text-gray-700">{permit.type}</div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="text-sm text-gray-700">{permit.holder}</div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="text-sm text-gray-700">{permit.issueDate}</div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className={`${permit.status === 'expiring' ? 'text-yellow-700' : permit.status === 'expired' ? 'text-red-700' : 'text-gray-700'} text-sm`}>{permit.expiryDate}</div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <Badge className={statusColors[permit.status]}>
-                            {statusLabels[permit.status]}
-                          </Badge>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="flex gap-2">
-                            <Button variant="outline" size="sm" className="bg-transparent">
-                              <FileText className="w-4 h-4" />
-                            </Button>
-                            <Button variant="outline" size="sm" className="bg-transparent">
-                              <Calendar className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              <div className="px-6 py-4 bg-gradient-to-r from-gray-50 to-blue-50 border-t border-gray-200">
-                <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-                  <p className="text-sm text-gray-600">
-                    Hiển thị {sortedPermits.length} trong tổng số {permits.length} giấy phép
-                  </p>
-                  <div className="flex items-center space-x-3">
-                    <Button variant="outline" className="bg-transparent">
-                      <FileText className="w-4 h-4 mr-2" />
-                      Xuất danh sách
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {sortedPermits.length === 0 && (
-              <div className="text-center py-12">
-                <FileText className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-gray-600 mb-2">Không tìm thấy giấy phép phù hợp</h3>
-                <p className="text-gray-500">Thử thay đổi từ khóa tìm kiếm hoặc bộ lọc</p>
-              </div>
-            )}
-
             {/* Permits Grid */}
-            <div className="hidden grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {filteredPermits.map(permit => (
                 <Card key={permit.id} className="bg-white/80 backdrop-blur-sm border-gray-200 hover:shadow-xl transition-all duration-300">
                   <CardHeader>
@@ -429,7 +274,7 @@ export default function Permits() {
             </div>
 
             {/* Empty State */}
-            {false && filteredPermits.length === 0 && (
+            {filteredPermits.length === 0 && (
               <div className="text-center py-12">
                 <FileText className="w-16 h-16 text-gray-300 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold text-gray-600 mb-2">

@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../..
 import { Button } from '../../components/ui/button'
 import { Badge } from '../../components/ui/badge'
 import { Input } from '../../components/ui/input'
-import { Search, Plus, Download, Share, Edit, Trash2, FileText, BarChart3, Calendar, Users, Home, ChevronRight, ArrowLeft } from 'lucide-react'
+import { Search, Plus, Download, Share, Edit, Trash2, FileText, BarChart3, Calendar, Users, Home, ChevronRight, ArrowLeft, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react'
 import FeatureSidebar from '../../components/FeatureSidebar'
 
 interface Report {
@@ -25,6 +25,8 @@ interface Report {
 export default function Reporting() {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedType, setSelectedType] = useState('all')
+  const [sortBy, setSortBy] = useState<'title' | 'type' | 'lastGenerated' | 'status' | 'schedule' | 'fileSize' | 'generatedBy'>('title')
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc')
 
   const reports: Report[] = [
     {
@@ -93,6 +95,50 @@ export default function Reporting() {
     const matchesType = selectedType === 'all' || report.type === selectedType
     return matchesSearch && matchesType
   })
+
+  const parseDate = (d: string) => {
+    const [day, month, year] = d.split('/').map(Number)
+    return new Date(year, (month || 1) - 1, day || 1).getTime()
+  }
+
+  const statusOrder: Record<Report['status'], number> = {
+    draft: 1,
+    scheduled: 2,
+    published: 3
+  }
+
+  const sortedReports = [...filteredReports].sort((a, b) => {
+    let cmp = 0
+    switch (sortBy) {
+      case 'title':
+        cmp = a.title.localeCompare(b.title)
+        break
+      case 'type':
+        cmp = a.type.localeCompare(b.type)
+        break
+      case 'lastGenerated':
+        cmp = parseDate(a.lastGenerated) - parseDate(b.lastGenerated)
+        break
+      case 'status':
+        cmp = statusOrder[a.status] - statusOrder[b.status]
+        break
+      case 'schedule':
+        cmp = a.schedule.localeCompare(b.schedule)
+        break
+      case 'fileSize':
+        cmp = a.fileSize.localeCompare(b.fileSize)
+        break
+      case 'generatedBy':
+        cmp = a.generatedBy.localeCompare(b.generatedBy)
+        break
+    }
+    return sortDir === 'asc' ? cmp : -cmp
+  })
+
+  const handleSort = (field: typeof sortBy) => {
+    if (sortBy === field) setSortDir(sortDir === 'asc' ? 'desc' : 'asc')
+    else { setSortBy(field); setSortDir('asc') }
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-50 py-8 pt-28">
@@ -222,8 +268,87 @@ export default function Reporting() {
               </div>
             </div>
 
+            {/* Reports Table */}
+            <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden mb-8">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
+                        <button className="inline-flex items-center gap-1" onClick={() => handleSort('title')}>
+                          Tiêu đề
+                          {sortBy !== 'title' ? <ArrowUpDown className="w-4 h-4 text-gray-400" /> : (sortDir === 'asc' ? <ArrowUp className="w-4 h-4 text-gray-600" /> : <ArrowDown className="w-4 h-4 text-gray-600" />)}
+                        </button>
+                      </th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
+                        <button className="inline-flex items-center gap-1" onClick={() => handleSort('type')}>
+                          Loại
+                          {sortBy !== 'type' ? <ArrowUpDown className="w-4 h-4 text-gray-400" /> : (sortDir === 'asc' ? <ArrowUp className="w-4 h-4 text-gray-600" /> : <ArrowDown className="w-4 h-4 text-gray-600" />)}
+                        </button>
+                      </th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
+                        <button className="inline-flex items-center gap-1" onClick={() => handleSort('lastGenerated')}>
+                          Lần tạo cuối
+                          {sortBy !== 'lastGenerated' ? <ArrowUpDown className="w-4 h-4 text-gray-400" /> : (sortDir === 'asc' ? <ArrowUp className="w-4 h-4 text-gray-600" /> : <ArrowDown className="w-4 h-4 text-gray-600" />)}
+                        </button>
+                      </th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
+                        <button className="inline-flex items-center gap-1" onClick={() => handleSort('status')}>
+                          Trạng thái
+                          {sortBy !== 'status' ? <ArrowUpDown className="w-4 h-4 text-gray-400" /> : (sortDir === 'asc' ? <ArrowUp className="w-4 h-4 text-gray-600" /> : <ArrowDown className="w-4 h-4 text-gray-600" />)}
+                        </button>
+                      </th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
+                        <button className="inline-flex items-center gap-1" onClick={() => handleSort('schedule')}>
+                          Lịch trình
+                          {sortBy !== 'schedule' ? <ArrowUpDown className="w-4 h-4 text-gray-400" /> : (sortDir === 'asc' ? <ArrowUp className="w-4 h-4 text-gray-600" /> : <ArrowDown className="w-4 h-4 text-gray-600" />)}
+                        </button>
+                      </th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
+                        <button className="inline-flex items-center gap-1" onClick={() => handleSort('fileSize')}>
+                          Kích thước
+                          {sortBy !== 'fileSize' ? <ArrowUpDown className="w-4 h-4 text-gray-400" /> : (sortDir === 'asc' ? <ArrowUp className="w-4 h-4 text-gray-600" /> : <ArrowDown className="w-4 h-4 text-gray-600" />)}
+                        </button>
+                      </th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
+                        <button className="inline-flex items-center gap-1" onClick={() => handleSort('generatedBy')}>
+                          Tạo bởi
+                          {sortBy !== 'generatedBy' ? <ArrowUpDown className="w-4 h-4 text-gray-400" /> : (sortDir === 'asc' ? <ArrowUp className="w-4 h-4 text-gray-600" /> : <ArrowDown className="w-4 h-4 text-gray-600" />)}
+                        </button>
+                      </th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Hành động</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {sortedReports.map(report => (
+                      <tr key={report.id} className="hover:bg-gray-50 transition-colors">
+                        <td className="px-6 py-4">
+                          <div className="text-sm font-semibold text-gray-900">{report.title}</div>
+                          <div className="text-xs text-gray-500">{report.description}</div>
+                        </td>
+                        <td className="px-6 py-4"><div className="text-sm text-gray-700">{types.find(t => t.id === report.type)?.name}</div></td>
+                        <td className="px-6 py-4"><div className="text-sm text-gray-700">{report.lastGenerated}</div></td>
+                        <td className="px-6 py-4"><Badge className={statusColors[report.status]}>{report.status === 'draft' ? 'Bản nháp' : report.status === 'published' ? 'Đã xuất bản' : 'Đã lên lịch'}</Badge></td>
+                        <td className="px-6 py-4"><div className="text-sm text-gray-700">{report.schedule}</div></td>
+                        <td className="px-6 py-4"><div className="text-sm text-gray-700">{report.fileSize}</div></td>
+                        <td className="px-6 py-4"><div className="text-sm text-gray-700">{report.generatedBy}</div></td>
+                        <td className="px-6 py-4">
+                          <div className="flex gap-2">
+                            <Button variant="outline" size="sm" className="bg-transparent p-2"><Edit className="w-4 h-4" /></Button>
+                            <Button variant="outline" size="sm" className="bg-transparent p-2"><Download className="w-4 h-4" /></Button>
+                            <Button variant="outline" size="sm" className="bg-transparent p-2"><Share className="w-4 h-4" /></Button>
+                            <Button variant="outline" size="sm" className="bg-transparent p-2"><Trash2 className="w-4 h-4" /></Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
             {/* Reports Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="hidden grid grid-cols-1 lg:grid-cols-2 gap-6">
               {filteredReports.map(report => (
                 <Card key={report.id} className="bg-white/80 backdrop-blur-sm border-gray-200 hover:shadow-xl transition-all duration-300">
                   <CardHeader>

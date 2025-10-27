@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../..
 import { Button } from '../../components/ui/button'
 import { Badge } from '../../components/ui/badge'
 import { Input } from '../../components/ui/input'
-import { Search, Plus, Download, Share, Edit, Trash2, Trash, AlertTriangle, Package, Home, ChevronRight, ArrowLeft, Calendar, MapPin } from 'lucide-react'
+import { Search, Plus, Download, Share, Edit, Trash2, Trash, AlertTriangle, Package, Home, ChevronRight, ArrowLeft, Calendar, MapPin, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react'
 import FeatureSidebar from '../../components/FeatureSidebar'
 
 interface WasteItem {
@@ -26,6 +26,8 @@ interface WasteItem {
 export default function Waste() {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('all')
+  const [sortBy, setSortBy] = useState<'name' | 'category' | 'quantity' | 'radioactivity' | 'location' | 'storedDate' | 'disposalDate' | 'status'>('name')
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc')
 
   const wasteItems: WasteItem[] = [
     {
@@ -110,6 +112,36 @@ export default function Waste() {
     const matchesCategory = selectedCategory === 'all' || item.category === selectedCategory
     return matchesSearch && matchesCategory
   })
+
+  const parseDate = (d: string) => {
+    const [day, month, year] = d.split('/').map(Number)
+    return new Date(year, (month || 1) - 1, day || 1).getTime()
+  }
+
+  const radioOrder: Record<string, number> = { 'Thấp': 1, 'Trung bình': 2, 'Cao': 3 }
+  const statusOrder: Record<WasteItem['status'], number> = { stored: 1, processing: 2, disposed: 3 }
+
+  const sortedItems = [...filteredItems].sort((a, b) => {
+    let cmp = 0
+    switch (sortBy) {
+      case 'name': cmp = a.name.localeCompare(b.name); break
+      case 'category': cmp = a.category.localeCompare(b.category); break
+      case 'quantity': cmp = a.quantity - b.quantity; break
+      case 'radioactivity':
+        cmp = (radioOrder[a.radioactivity] ?? 0) - (radioOrder[b.radioactivity] ?? 0)
+        break
+      case 'location': cmp = a.location.localeCompare(b.location); break
+      case 'storedDate': cmp = parseDate(a.storedDate) - parseDate(b.storedDate); break
+      case 'disposalDate': cmp = parseDate(a.disposalDate) - parseDate(b.disposalDate); break
+      case 'status': cmp = statusOrder[a.status] - statusOrder[b.status]; break
+    }
+    return sortDir === 'asc' ? cmp : -cmp
+  })
+
+  const handleSort = (field: typeof sortBy) => {
+    if (sortBy === field) setSortDir(sortDir === 'asc' ? 'desc' : 'asc')
+    else { setSortBy(field); setSortDir('asc') }
+  }
 
   const totalItems = wasteItems.length
   const storedItems = wasteItems.filter(item => item.status === 'stored').length
@@ -245,8 +277,69 @@ export default function Waste() {
               </div>
             </div>
 
+            {/* Waste Items Table */}
+            <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden mb-8">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
+                        <button className="inline-flex items-center gap-1" onClick={() => handleSort('name')}>
+                          Tên
+                          {sortBy !== 'name' ? <ArrowUpDown className="w-4 h-4 text-gray-400" /> : (sortDir === 'asc' ? <ArrowUp className="w-4 h-4 text-gray-600" /> : <ArrowDown className="w-4 h-4 text-gray-600" />)}
+                        </button>
+                      </th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
+                        <button className="inline-flex items-center gap-1" onClick={() => handleSort('category')}>
+                          Loại
+                          {sortBy !== 'category' ? <ArrowUpDown className="w-4 h-4 text-gray-400" /> : (sortDir === 'asc' ? <ArrowUp className="w-4 h-4 text-gray-600" /> : <ArrowDown className="w-4 h-4 text-gray-600" />)}
+                        </button>
+                      </th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
+                        <button className="inline-flex items-center gap-1" onClick={() => handleSort('quantity')}>
+                          Số lượng
+                          {sortBy !== 'quantity' ? <ArrowUpDown className="w-4 h-4 text-gray-400" /> : (sortDir === 'asc' ? <ArrowUp className="w-4 h-4 text-gray-600" /> : <ArrowDown className="w-4 h-4 text-gray-600" />)}
+                        </button>
+                      </th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Mức phóng xạ</th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Vị trí</th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Ngày lưu</th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Ngày xử lý</th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Trạng thái</th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Hành động</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {sortedItems.map(item => (
+                      <tr key={item.id} className="hover:bg-gray-50 transition-colors">
+                        <td className="px-6 py-4">
+                          <div className="text-sm font-semibold text-gray-900">{item.name}</div>
+                          <div className="text-xs text-gray-500">{item.description}</div>
+                        </td>
+                        <td className="px-6 py-4"><div className="text-sm text-gray-700">{categories.find(c => c.id === item.category)?.name}</div></td>
+                        <td className="px-6 py-4"><div className="text-sm text-gray-700">{item.quantity}</div></td>
+                        <td className="px-6 py-4"><Badge className={radioactivityColors[item.radioactivity as keyof typeof radioactivityColors]}>{item.radioactivity}</Badge></td>
+                        <td className="px-6 py-4"><div className="text-sm text-gray-700">{item.location}</div></td>
+                        <td className="px-6 py-4"><div className="text-sm text-gray-700">{item.storedDate}</div></td>
+                        <td className="px-6 py-4"><div className="text-sm text-gray-700">{item.disposalDate}</div></td>
+                        <td className="px-6 py-4"><Badge className={statusColors[item.status]}>{statusLabels[item.status]}</Badge></td>
+                        <td className="px-6 py-4">
+                          <div className="flex gap-2">
+                            <Button variant="outline" size="sm" className="bg-transparent p-2"><Edit className="w-4 h-4" /></Button>
+                            <Button variant="outline" size="sm" className="bg-transparent p-2"><Download className="w-4 h-4" /></Button>
+                            <Button variant="outline" size="sm" className="bg-transparent p-2"><Share className="w-4 h-4" /></Button>
+                            <Button variant="outline" size="sm" className="bg-transparent p-2"><Trash2 className="w-4 h-4" /></Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
             {/* Waste Items Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="hidden grid grid-cols-1 lg:grid-cols-2 gap-6">
               {filteredItems.map(item => (
                 <Card key={item.id} className="bg-white/80 backdrop-blur-sm border-gray-200 hover:shadow-xl transition-all duration-300">
                   <CardHeader>
@@ -303,7 +396,7 @@ export default function Waste() {
                         </Button>
                       </div>
                     </div>
-                  </CardContent>Các chức năng
+                  </CardContent>
                 </Card>
               ))}
             </div>

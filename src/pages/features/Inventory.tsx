@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../..
 import { Button } from '../../components/ui/button'
 import { Badge } from '../../components/ui/badge'
 import { Input } from '../../components/ui/input'
-import { Search, Plus, Download, Share, Edit, Trash2, Package, Layers, Home, ChevronRight, ArrowLeft, BarChart3, AlertTriangle } from 'lucide-react'
+import { Search, Plus, Download, Share, Edit, Trash2, Package, Layers, Home, ChevronRight, ArrowLeft, BarChart3, AlertTriangle, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react'
 import FeatureSidebar from '../../components/FeatureSidebar'
 
 interface InventoryItem {
@@ -25,6 +25,8 @@ interface InventoryItem {
 export default function Inventory() {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('all')
+  const [sortBy, setSortBy] = useState<'name' | 'category' | 'quantity' | 'minStock' | 'location' | 'lastUpdated' | 'status'>('name')
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc')
 
   const inventoryItems: InventoryItem[] = [
     {
@@ -99,6 +101,32 @@ export default function Inventory() {
     const matchesCategory = selectedCategory === 'all' || item.category === selectedCategory
     return matchesSearch && matchesCategory
   })
+
+  const parseDate = (d: string) => {
+    const [day, month, year] = d.split('/').map(Number)
+    return new Date(year, (month || 1) - 1, day || 1).getTime()
+  }
+
+  const statusOrder: Record<InventoryItem['status'], number> = { 'in-stock': 1, 'low-stock': 2, 'out-of-stock': 3 }
+
+  const sortedItems = [...filteredItems].sort((a, b) => {
+    let cmp = 0
+    switch (sortBy) {
+      case 'name': cmp = a.name.localeCompare(b.name); break
+      case 'category': cmp = a.category.localeCompare(b.category); break
+      case 'quantity': cmp = a.quantity - b.quantity; break
+      case 'minStock': cmp = a.minStock - b.minStock; break
+      case 'location': cmp = a.location.localeCompare(b.location); break
+      case 'lastUpdated': cmp = parseDate(a.lastUpdated) - parseDate(b.lastUpdated); break
+      case 'status': cmp = statusOrder[a.status] - statusOrder[b.status]; break
+    }
+    return sortDir === 'asc' ? cmp : -cmp
+  })
+
+  const handleSort = (field: typeof sortBy) => {
+    if (sortBy === field) setSortDir(sortDir === 'asc' ? 'desc' : 'asc')
+    else { setSortBy(field); setSortDir('asc') }
+  }
 
   const totalItems = inventoryItems.length
   const lowStockItems = inventoryItems.filter(item => item.status === 'low-stock').length
@@ -233,8 +261,49 @@ export default function Inventory() {
               </div>
             </div>
 
+            {/* Inventory Items Table */}
+            <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden mb-8">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900"><button className="inline-flex items-center gap-1" onClick={() => handleSort('name')}>Tên {sortBy !== 'name' ? <ArrowUpDown className="w-4 h-4 text-gray-400" /> : (sortDir === 'asc' ? <ArrowUp className="w-4 h-4 text-gray-600" /> : <ArrowDown className="w-4 h-4 text-gray-600" />)}</button></th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900"><button className="inline-flex items-center gap-1" onClick={() => handleSort('category')}>Loại {sortBy !== 'category' ? <ArrowUpDown className="w-4 h-4 text-gray-400" /> : (sortDir === 'asc' ? <ArrowUp className="w-4 h-4 text-gray-600" /> : <ArrowDown className="w-4 h-4 text-gray-600" />)}</button></th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900"><button className="inline-flex items-center gap-1" onClick={() => handleSort('quantity')}>Số lượng {sortBy !== 'quantity' ? <ArrowUpDown className="w-4 h-4 text-gray-400" /> : (sortDir === 'asc' ? <ArrowUp className="w-4 h-4 text-gray-600" /> : <ArrowDown className="w-4 h-4 text-gray-600" />)}</button></th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900"><button className="inline-flex items-center gap-1" onClick={() => handleSort('minStock')}>Tồn tối thiểu {sortBy !== 'minStock' ? <ArrowUpDown className="w-4 h-4 text-gray-400" /> : (sortDir === 'asc' ? <ArrowUp className="w-4 h-4 text-gray-600" /> : <ArrowDown className="w-4 h-4 text-gray-600" />)}</button></th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900"><button className="inline-flex items-center gap-1" onClick={() => handleSort('location')}>Vị trí {sortBy !== 'location' ? <ArrowUpDown className="w-4 h-4 text-gray-400" /> : (sortDir === 'asc' ? <ArrowUp className="w-4 h-4 text-gray-600" /> : <ArrowDown className="w-4 h-4 text-gray-600" />)}</button></th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900"><button className="inline-flex items-center gap-1" onClick={() => handleSort('lastUpdated')}>Cập nhật {sortBy !== 'lastUpdated' ? <ArrowUpDown className="w-4 h-4 text-gray-400" /> : (sortDir === 'asc' ? <ArrowUp className="w-4 h-4 text-gray-600" /> : <ArrowDown className="w-4 h-4 text-gray-600" />)}</button></th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900"><button className="inline-flex items-center gap-1" onClick={() => handleSort('status')}>Trạng thái {sortBy !== 'status' ? <ArrowUpDown className="w-4 h-4 text-gray-400" /> : (sortDir === 'asc' ? <ArrowUp className="w-4 h-4 text-gray-600" /> : <ArrowDown className="w-4 h-4 text-gray-600" />)}</button></th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Hành động</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {sortedItems.map(item => (
+                      <tr key={item.id} className="hover:bg-gray-50 transition-colors">
+                        <td className="px-6 py-4"><div className="text-sm font-semibold text-gray-900">{item.name}</div><div className="text-xs text-gray-500">{item.description}</div></td>
+                        <td className="px-6 py-4"><div className="text-sm text-gray-700">{categories.find(c => c.id === item.category)?.name}</div></td>
+                        <td className="px-6 py-4"><div className="text-sm text-gray-700">{item.quantity}</div></td>
+                        <td className="px-6 py-4"><div className="text-sm text-gray-700">{item.minStock}</div></td>
+                        <td className="px-6 py-4"><div className="text-sm text-gray-700">{item.location}</div></td>
+                        <td className="px-6 py-4"><div className="text-sm text-gray-700">{item.lastUpdated}</div></td>
+                        <td className="px-6 py-4"><Badge className={statusColors[item.status]}>{statusLabels[item.status]}</Badge></td>
+                        <td className="px-6 py-4">
+                          <div className="flex gap-2">
+                            <Button variant="outline" size="sm" className="bg-transparent p-2"><Edit className="w-4 h-4" /></Button>
+                            <Button variant="outline" size="sm" className="bg-transparent p-2"><Download className="w-4 h-4" /></Button>
+                            <Button variant="outline" size="sm" className="bg-transparent p-2"><Share className="w-4 h-4" /></Button>
+                            <Button variant="outline" size="sm" className="bg-transparent p-2"><Trash2 className="w-4 h-4" /></Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
             {/* Inventory Items Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="hidden grid grid-cols-1 lg:grid-cols-2 gap-6">
               {filteredItems.map(item => (
                 <Card key={item.id} className="bg-white/80 backdrop-blur-sm border-gray-200 hover:shadow-xl transition-all duration-300">
                   <CardHeader>

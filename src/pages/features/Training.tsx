@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../..
 import { Button } from '../../components/ui/button'
 import { Badge } from '../../components/ui/badge'
 import { Input } from '../../components/ui/input'
-import { Search, Plus, Download, Share, Edit, Trash2, GraduationCap, Users, Calendar, Clock, Home, ChevronRight, ArrowLeft } from 'lucide-react'
+import { Search, Plus, Download, Share, Edit, Trash2, GraduationCap, Users, Calendar, Clock, Home, ChevronRight, ArrowLeft, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react'
 import FeatureSidebar from '../../components/FeatureSidebar'
 
 interface TrainingCourse {
@@ -25,6 +25,8 @@ interface TrainingCourse {
 export default function Training() {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('all')
+  const [sortBy, setSortBy] = useState<'title' | 'category' | 'participants' | 'instructor' | 'startDate' | 'duration' | 'status'>('title')
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc')
 
   const courses: TrainingCourse[] = [
     {
@@ -99,6 +101,36 @@ export default function Training() {
     const matchesCategory = selectedCategory === 'all' || course.category === selectedCategory
     return matchesSearch && matchesCategory
   })
+
+  const parseDate = (d: string) => {
+    const [day, month, year] = d.split('/').map(Number)
+    return new Date(year, (month || 1) - 1, day || 1).getTime()
+  }
+
+  const statusOrder: Record<TrainingCourse['status'], number> = {
+    upcoming: 1,
+    ongoing: 2,
+    completed: 3
+  }
+
+  const sortedCourses = [...filteredCourses].sort((a, b) => {
+    let cmp = 0
+    switch (sortBy) {
+      case 'title': cmp = a.title.localeCompare(b.title); break
+      case 'category': cmp = a.category.localeCompare(b.category); break
+      case 'participants': cmp = a.participants - b.participants; break
+      case 'instructor': cmp = a.instructor.localeCompare(b.instructor); break
+      case 'startDate': cmp = parseDate(a.startDate) - parseDate(b.startDate); break
+      case 'duration': cmp = a.duration.localeCompare(b.duration); break
+      case 'status': cmp = statusOrder[a.status] - statusOrder[b.status]; break
+    }
+    return sortDir === 'asc' ? cmp : -cmp
+  })
+
+  const handleSort = (field: typeof sortBy) => {
+    if (sortBy === field) setSortDir(sortDir === 'asc' ? 'desc' : 'asc')
+    else { setSortBy(field); setSortDir('asc') }
+  }
 
   const totalCourses = courses.length
   const ongoingCourses = courses.filter(course => course.status === 'ongoing').length
@@ -233,8 +265,49 @@ export default function Training() {
               </div>
             </div>
 
+            {/* Courses Table */}
+            <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden mb-8">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900"><button className="inline-flex items-center gap-1" onClick={() => handleSort('title')}>Khoá học {sortBy !== 'title' ? <ArrowUpDown className="w-4 h-4 text-gray-400" /> : (sortDir === 'asc' ? <ArrowUp className="w-4 h-4 text-gray-600" /> : <ArrowDown className="w-4 h-4 text-gray-600" />)}</button></th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900"><button className="inline-flex items-center gap-1" onClick={() => handleSort('category')}>Loại {sortBy !== 'category' ? <ArrowUpDown className="w-4 h-4 text-gray-400" /> : (sortDir === 'asc' ? <ArrowUp className="w-4 h-4 text-gray-600" /> : <ArrowDown className="w-4 h-4 text-gray-600" />)}</button></th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900"><button className="inline-flex items-center gap-1" onClick={() => handleSort('participants')}>Học viên {sortBy !== 'participants' ? <ArrowUpDown className="w-4 h-4 text-gray-400" /> : (sortDir === 'asc' ? <ArrowUp className="w-4 h-4 text-gray-600" /> : <ArrowDown className="w-4 h-4 text-gray-600" />)}</button></th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900"><button className="inline-flex items-center gap-1" onClick={() => handleSort('instructor')}>Giảng viên {sortBy !== 'instructor' ? <ArrowUpDown className="w-4 h-4 text-gray-400" /> : (sortDir === 'asc' ? <ArrowUp className="w-4 h-4 text-gray-600" /> : <ArrowDown className="w-4 h-4 text-gray-600" />)}</button></th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900"><button className="inline-flex items-center gap-1" onClick={() => handleSort('startDate')}>Ngày bắt đầu {sortBy !== 'startDate' ? <ArrowUpDown className="w-4 h-4 text-gray-400" /> : (sortDir === 'asc' ? <ArrowUp className="w-4 h-4 text-gray-600" /> : <ArrowDown className="w-4 h-4 text-gray-600" />)}</button></th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900"><button className="inline-flex items-center gap-1" onClick={() => handleSort('duration')}>Thời lượng {sortBy !== 'duration' ? <ArrowUpDown className="w-4 h-4 text-gray-400" /> : (sortDir === 'asc' ? <ArrowUp className="w-4 h-4 text-gray-600" /> : <ArrowDown className="w-4 h-4 text-gray-600" />)}</button></th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900"><button className="inline-flex items-center gap-1" onClick={() => handleSort('status')}>Trạng thái {sortBy !== 'status' ? <ArrowUpDown className="w-4 h-4 text-gray-400" /> : (sortDir === 'asc' ? <ArrowUp className="w-4 h-4 text-gray-600" /> : <ArrowDown className="w-4 h-4 text-gray-600" />)}</button></th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Hành động</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {sortedCourses.map(course => (
+                      <tr key={course.id} className="hover:bg-gray-50 transition-colors">
+                        <td className="px-6 py-4"><div className="text-sm font-semibold text-gray-900">{course.title}</div><div className="text-xs text-gray-500">{course.description}</div></td>
+                        <td className="px-6 py-4"><div className="text-sm text-gray-700">{categories.find(c => c.id === course.category)?.name}</div></td>
+                        <td className="px-6 py-4"><div className="text-sm text-gray-700">{course.participants}</div></td>
+                        <td className="px-6 py-4"><div className="text-sm text-gray-700">{course.instructor}</div></td>
+                        <td className="px-6 py-4"><div className="text-sm text-gray-700">{course.startDate}</div></td>
+                        <td className="px-6 py-4"><div className="text-sm text-gray-700">{course.duration}</div></td>
+                        <td className="px-6 py-4"><Badge className={statusColors[course.status]}>{statusLabels[course.status]}</Badge></td>
+                        <td className="px-6 py-4">
+                          <div className="flex gap-2">
+                            <Button variant="outline" size="sm" className="bg-transparent p-2"><Edit className="w-4 h-4" /></Button>
+                            <Button variant="outline" size="sm" className="bg-transparent p-2"><Download className="w-4 h-4" /></Button>
+                            <Button variant="outline" size="sm" className="bg-transparent p-2"><Share className="w-4 h-4" /></Button>
+                            <Button variant="outline" size="sm" className="bg-transparent p-2"><Trash2 className="w-4 h-4" /></Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
             {/* Courses Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="hidden grid grid-cols-1 lg:grid-cols-2 gap-6">
               {filteredCourses.map(course => (
                 <Card key={course.id} className="bg-white/80 backdrop-blur-sm border-gray-200 hover:shadow-xl transition-all duration-300">
                   <CardHeader>
