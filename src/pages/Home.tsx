@@ -3,9 +3,17 @@
  */
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
+import { useEffect, useState } from 'react'
 import { ArrowRight, CheckCircle, FileText, Clock, Shield, Workflow, Zap } from 'lucide-react'
 
 export default function Home() {
+  const [loggedIn, setLoggedIn] = useState(false)
+  useEffect(() => {
+    setLoggedIn(localStorage.getItem('isLoggedIn') === 'true')
+    const onStorage = () => setLoggedIn(localStorage.getItem('isLoggedIn') === 'true')
+    window.addEventListener('storage', onStorage)
+    return () => window.removeEventListener('storage', onStorage)
+  }, [])
   const benefits = [
     {
       icon: FileText,
@@ -117,6 +125,16 @@ export default function Home() {
                 <ArrowRight className="ml-3 h-5 w-5" />
               </Link>
             </motion.div>
+            {!loggedIn && (
+              <div className="mt-6 text-center">
+                <Link
+                  to="/login"
+                  className="inline-flex items-center px-6 py-4 bg-white text-[#004C99] font-semibold rounded-xl border border-blue-200 hover:bg-blue-50 transition-all duration-300 shadow-sm"
+                >
+                  Đăng nhập
+                </Link>
+              </div>
+            )}
           </motion.div>
         </div>
       </section>

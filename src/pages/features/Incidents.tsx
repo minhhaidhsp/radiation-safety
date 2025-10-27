@@ -19,7 +19,7 @@ import {
 } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from '../../components/ui/button'
-import FeatureSidebar from '../../components/FeatureSidebar'
+import FeatureLayout from '../../components/FeatureLayout'
 
 export default function Incidents() {
   const [searchTerm, setSearchTerm] = useState('')
@@ -87,16 +87,7 @@ export default function Incidents() {
   ).filter(incident => activeTab === 'all' || incident.status === activeTab)
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-8 pt-28">
-      <div className="container mx-auto px-4">
-        <div className="flex gap-8">
-          {/* Sidebar */}
-          <div className="hidden lg:block">
-            <FeatureSidebar />
-          </div>
-
-          {/* Main Content */}
-          <div className="flex-1">
+    <FeatureLayout>
             {/* Breadcrumb và nút back */}
             <div className="flex items-center justify-between mb-8">
               <nav className="flex items-center space-x-2 text-sm text-gray-600">
@@ -308,9 +299,6 @@ export default function Incidents() {
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    </FeatureLayout>
   )
 }

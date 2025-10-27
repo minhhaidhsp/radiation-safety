@@ -8,7 +8,7 @@ import { Button } from '../../components/ui/button'
 import { Badge } from '../../components/ui/badge'
 import { Input } from '../../components/ui/input'
 import { Search, Plus, Download, Share, Edit, Trash2, FileText, BarChart3, Calendar, Users, Home, ChevronRight, ArrowLeft, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react'
-import FeatureSidebar from '../../components/FeatureSidebar'
+import FeatureLayout from '../../components/FeatureLayout'
 
 interface Report {
   id: number
@@ -141,16 +141,7 @@ export default function Reporting() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-50 py-8 pt-28">
-      <div className="container mx-auto px-4">
-        <div className="flex gap-8">
-          {/* Sidebar */}
-          <div className="hidden lg:block">
-            <FeatureSidebar />
-          </div>
-
-          {/* Main Content */}
-          <div className="flex-1">
+    <FeatureLayout>
             {/* Breadcrumb và nút Back */}
             <div className="flex items-center justify-between mb-8">
               <nav className="flex items-center space-x-2 text-sm text-gray-600">
@@ -413,9 +404,6 @@ export default function Reporting() {
                 </p>
               </div>
             )}
-          </div>
-        </div>
-      </div>
-    </div>
+    </FeatureLayout>
   )
 }

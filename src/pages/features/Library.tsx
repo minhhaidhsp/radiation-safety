@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../..
 import { Button } from '../../components/ui/button'
 import { Badge } from '../../components/ui/badge'
 import { FileText, Download, Eye, BookOpen, Home, ChevronRight, ArrowLeft } from 'lucide-react'
-import FeatureSidebar from '../../components/FeatureSidebar'
+import FeatureLayout from '../../components/FeatureLayout'
 
 interface Document {
   id: number
@@ -76,16 +76,7 @@ export default function Library() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-8 pt-28">
-      <div className="container mx-auto px-4">
-        <div className="flex gap-8">
-          {/* Sidebar */}
-          <div className="hidden lg:block">
-            <FeatureSidebar />
-          </div>
-
-          {/* Main Content */}
-          <div className="flex-1">
+    <FeatureLayout>
             {/* Breadcrumb và nút Back */}
             <div className="flex items-center justify-between mb-8">
               <nav className="flex items-center space-x-2 text-sm text-gray-600">
@@ -166,9 +157,6 @@ export default function Library() {
                 )
               })}
             </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    </FeatureLayout>
   )
 }
