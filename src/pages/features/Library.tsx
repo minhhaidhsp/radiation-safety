@@ -31,47 +31,48 @@ export default function Library() {
   const [previewDoc, setPreviewDoc] = useState<Document | null>(null)
 
   const documents: Document[] = [
-    {
-      id: 1,
-      title: 'HÆ°á»›ng dáº«n an toÃ n bá»©c xáº¡',
-      description: 'TÃ i liá»‡u hÆ°á»›ng dáº«n Ä‘áº§y Ä‘á»§ vá» an toÃ n bá»©c xáº¡ trong cÃ´ng nghiá»‡p',
-      category: 'safety',
-      fileSize: '2.4 MB',
-      uploadDate: '25/09/2025',
-      downloads: 156,
-      type: 'pdf'
-    },
-    {
-      id: 2,
-      title: 'Quy trÃ¬nh xá»­ lÃ½ sá»± cá»‘',
-      description: 'Quy trÃ¬nh chi tiáº¿t xá»­ lÃ½ cÃ¡c sá»± cá»‘ bá»©c xáº¡',
-      category: 'procedure',
-      fileSize: '1.8 MB',
-      uploadDate: '24/09/2025',
-      downloads: 89,
-      type: 'pdf'
-    },
-    {
-      id: 3,
-      title: 'Video Ä‘Ã o táº¡o an toÃ n',
-      description: 'Video hÆ°á»›ng dáº«n thá»±c hÃ nh an toÃ n bá»©c xáº¡',
-      category: 'training',
-      fileSize: '45.2 MB',
-      uploadDate: '22/09/2025',
-      downloads: 234,
-      type: 'video'
-    },
-    {
-      id: 4,
-      title: 'Biá»ƒu máº«u bÃ¡o cÃ¡o Ä‘á»‹nh ká»³',
-      description: 'Máº«u bÃ¡o cÃ¡o Ä‘á»‹nh ká»³ an toÃ n bá»©c xáº¡',
-      category: 'forms',
-      fileSize: '0.8 MB',
-      uploadDate: '20/09/2025',
-      downloads: 67,
-      type: 'doc'
-    }
-  ]
+  {
+    id: 1,
+    title: 'Hướng dẫn an toàn bức xạ',
+    description: 'Tài liệu hướng dẫn đầy đủ về an toàn bức xạ trong công nghiệp',
+    category: 'safety',
+    fileSize: '2.4 MB',
+    uploadDate: '25/09/2025',
+    downloads: 156,
+    type: 'pdf'
+  },
+  {
+    id: 2,
+    title: 'Quy trình xử lý sự cố',
+    description: 'Quy trình chi tiết xử lý các sự cố bức xạ',
+    category: 'procedure',
+    fileSize: '1.8 MB',
+    uploadDate: '24/09/2025',
+    downloads: 89,
+    type: 'pdf'
+  },
+  {
+    id: 3,
+    title: 'Video đào tạo an toàn',
+    description: 'Video hướng dẫn thực hành an toàn bức xạ',
+    category: 'training',
+    fileSize: '45.2 MB',
+    uploadDate: '22/09/2025',
+    downloads: 234,
+    type: 'video'
+  },
+  {
+    id: 4,
+    title: 'Biểu mẫu báo cáo định kỳ',
+    description: 'Mẫu báo cáo định kỳ an toàn bức xạ',
+    category: 'forms',
+    fileSize: '0.8 MB',
+    uploadDate: '20/09/2025',
+    downloads: 67,
+    type: 'doc'
+  }
+]
+
 
   const typeIcons = {
     pdf: FileText,
@@ -120,10 +121,10 @@ export default function Library() {
                 </Link>
                 <ChevronRight className="w-4 h-4" />
                 <Link to="/features" className="hover:text-gray-900 transition-colors">
-                CÃ¡c chá»©c nÄƒng
+                Các chức năng
                 </Link>
                 <ChevronRight className="w-4 h-4" />
-                <span className="text-gray-900 font-medium">ThÆ° viá»‡n tÃ i liá»‡u</span>
+                <span className="text-gray-900 font-medium">Thư viện tài liệu</span>
               </nav>
 
               <Link
@@ -131,17 +132,17 @@ export default function Library() {
                 className="flex items-center px-4 py-2 bg-gradient-to-r from-blue-50 to-teal-50 text-[#004C99] hover:from-blue-100 hover:to-teal-100 transition-all duration-300 rounded-lg border border-blue-200 hover:border-blue-300"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Quay láº¡i
+                Quay lại
               </Link>
             </div>
 
             {/* Header */}
             <div className="text-center mb-8">
               <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-[#004C99] to-[#00B8B0] bg-clip-text text-transparent">
-                THÆ¯ VIá»†N TÃ€I LIá»†U
+                THƯ VIỆN TÀI LIỆU
               </h1>
               <p className="text-lg text-gray-700 max-w-2xl mx-auto">
-                Kho tÃ i liá»‡u, hÆ°á»›ng dáº«n vÃ  biá»ƒu máº«u vá» an toÃ n bá»©c xáº¡
+                Kho tài liệu, hướng dẫn và biểu mẫu về an toàn bức xạ.
               </p>
             </div>
 
@@ -150,7 +151,7 @@ export default function Library() {
               <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
                 <div className="flex gap-3 items-center w-full md:w-auto">
                   <div className="relative w-full md:w-96">
-                    <Input value={search} onChange={(e)=>setSearch(e.target.value)} placeholder="Tìm tài li?u..." className="pl-10" />
+                    <Input value={search} onChange={(e)=>setSearch(e.target.value)} placeholder="Tìm tài liệu..." className="pl-10" />
                     <Eye className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
                   </div>
                   <Button variant="outline" className="bg-transparent" onClick={()=>setTypeFilter('all')}>Tất cả</Button>
@@ -163,7 +164,7 @@ export default function Library() {
                     {(sortDir==='asc'? <ArrowUp className="w-4 h-4 mr-2" /> : <ArrowDown className="w-4 h-4 mr-2" />)} Sắp xếp
                   </Button>
                   <Button className="bg-gradient-to-r from-[#004C99] to-[#00B8B0] text-white">
-                    <Upload className="w-4 h-4 mr-2" /> T?i lên
+                    <Upload className="w-4 h-4 mr-2" /> Tải lên
                   </Button>
                 </div>
               </div>
@@ -187,12 +188,12 @@ export default function Library() {
                     <CardContent>
                       <div className="space-y-3">
                         <div className="flex justify-between text-sm text-gray-600">
-                          <span>KÃ­ch thÆ°á»›c: <strong>{doc.fileSize}</strong></span>
-                          <span>Táº£i xuá»‘ng: <strong>{doc.downloads}</strong></span>
+                          <span>Kích thước: <strong>{doc.fileSize}</strong></span>
+                          <span>Tải xuống: <strong>{doc.downloads}</strong></span>
                         </div>
                         
                         <div className="flex justify-between text-sm text-gray-600">
-                          <span>NgÃ y upload: <strong>{doc.uploadDate}</strong></span>
+                          <span>Ngày upload: <strong>{doc.uploadDate}</strong></span>
                         </div>
 
                         <div className="flex gap-2 pt-2">
@@ -259,15 +260,15 @@ export default function Library() {
                 <div className="px-4 pb-4 text-sm text-gray-700">
                   <div className="grid grid-cols-2 gap-3">
                     <div>Loại: <Badge className={previewDoc ? typeColors[previewDoc.type] : ''}>{previewDoc?.type.toUpperCase()}</Badge></div>
-                    <div>Kích thu?c: <strong>{previewDoc?.fileSize}</strong></div>
+                    <div>Kích thước: <strong>{previewDoc?.fileSize}</strong></div>
                     <div>Danh mục: <strong>{previewDoc?.category}</strong></div>
                     <div>Upload: <strong>{previewDoc?.uploadDate}</strong></div>
                     <div>Tải xuống: <strong>{previewDoc?.downloads}</strong></div>
                   </div>
-                  <div className="mt-4 p-4 bg-gray-50 rounded-lg border">Khu v?c xem nhanh (mock preview)</div>
+                  <div className="mt-4 p-4 bg-gray-50 rounded-lg border">Khu vực xem nhanh (mock preview)</div>
                 </div>
                 <DrawerFooter>
-                  <Button className="bg-gradient-to-r from-[#004C99] to-[#00B8B0] text-white">T?i xu?ng</Button>
+                  <Button className="bg-gradient-to-r from-[#004C99] to-[#00B8B0] text-white">Tải xuống</Button>
                   <DrawerClose asChild>
                     <Button variant="outline">Ðóng</Button>
                   </DrawerClose>
